@@ -1,0 +1,12 @@
+{
+  "name": "Trello Scrum",
+  "version": "1.0",
+  "description": "Adds Scrum to your Trello",
+  "content_scripts": [
+  	{
+  	  "matches": ["https://trello.com/board/*"],
+  	  "js": ["jquery-1.6.2.min.js","trelloscrum.js"],
+  	  "css": ["trelloscrum.css"]
+  	}
+  ]
+}

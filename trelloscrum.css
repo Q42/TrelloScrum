@@ -1,0 +1,22 @@
+.totalScore {
+	color: #006580;
+	font-size: 16px;
+	font-weight: bold;
+	line-height: 26px;
+	display: inline;
+	vertical-align: middle;
+}
+.list-title h2 {
+	margin-right: 5px !important;
+}
+.subTotal {
+	font-weight: bold;
+	margin-right: 5px;
+	position: absolute;
+	right: 0px;
+	bottom: 0px;
+}
+.list-card-members {
+	margin-right: 0px !important;
+}
+
