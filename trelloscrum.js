@@ -1,30 +1,28 @@
-//alert('jQ:'+$);
-$(function(){
-	var to;
-	function periodical() {
-		clearTimeout(to);
-		parseCards();
-		to=setTimeout(periodical,1000);
-	};
-	function parseCards() {
-		$('div.list').each(function(){
-			var totalPoints=0;
-			var _total=$(this).find('.totalScore')[0]?$(this).find('.totalScore'):$('<span class="totalScore">');
-			$(this).find('.list-card-title a').each(function(){
-				var points=Number($(this).text().replace(/^.*\((\d+)\).*$/,'$1'));
-				var cp=false;
-				if(isNaN(points))points=Number($(this).prev('span').text().replace(/^.*\((\d+)\).*$/,'$1'));
-				else cp=true;
-				if(!isNaN(points)&&points>0){
-					var _subtotal=$(this).prev('span')[0]?$(this).prev('span'):$('<span class="subTotal">');
-					$(this).before(_subtotal.text(points));
-					if(cp)$(this).text($(this).text().replace(/\(\d+\)\s?/,''));
-					totalPoints+=points;
-				}
-			});
-			if(totalPoints>0)$(this).find('.list-header h2').after(_total.text(totalPoints));
+//TrelloScrum - https://github.com/marcelduin/TrelloScrum
+//Adds Scrum to your Trello
+//Project by Jasper Kaizer <jasper@q42.nl> & Marcel Duin <marcel@q42.nl>
+function scoreCards() {
+	$('div.list').each(function(){
+		var list=$(this);
+		var totalPoints=0;
+		list.find('.list-card-title a').each(function(){
+			var title=$(this);
+			var score=title[0].score||0;
+			var points=Number(title.text().replace(/^.*\((\d+)\).*$/,'$1'));
+			if(!isNaN(points)&&points!=score){
+				title.text(title.text().replace(/\(\d+\)\s?/,''))[0].score=score=points;
+				var _subtotal=title.prev('.subTotal');
+				if(!_subtotal[0])_subtotal=$('<span class="subTotal">').insertBefore(title);
+				_subtotal.text(score>0?score:'');
+			}
+			totalPoints+=score
 		});
-	};
-	periodical();
+		var _total=list.find('.totalScore');
+		if(!_total[0])_total=$('<span class="totalScore">').insertAfter(list.find('.list-header h2'));
+		_total.text(totalPoints>0?totalPoints:'')
+	})
+};
+$(function periodical() {
+	scoreCards();
+	setTimeout(periodical,1000)
 });
-
