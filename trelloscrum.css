@@ -2,21 +2,23 @@
 	color: #006580;
 	font-size: 16px;
 	font-weight: bold;
-	line-height: 26px;
-	display: inline;
-	vertical-align: middle;
+	float: right;
+	margin: 4px 5px 0 0;
 }
 .list-title h2 {
-	margin-right: 5px !important;
+	float: none !important;
+	display: inline !important;
+	margin-right: 0 !important;
+	vertical-align: -4px;
 }
 .subTotal {
 	font-weight: bold;
-	margin-right: 5px;
 	position: absolute;
-	right: 0px;
-	bottom: 0px;
+	right: 5px;
+	top: 2px;
 }
-.list-card-members {
-	margin-right: 0px !important;
+.card-operation.js-card-menu {
+	background: #fff;
+	z-index: 2;
 }
 

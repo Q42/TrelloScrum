@@ -13,12 +13,12 @@ function scoreCards() {
 				title.text(title.text().replace(/\(\d+\)\s?/,''))[0].score=score=points;
 				var _subtotal=title.prev('.subTotal');
 				if(!_subtotal[0])_subtotal=$('<span class="subTotal">').insertBefore(title);
-				_subtotal.text(score>0?score:'');
+				_subtotal.text(score>0?score:'')
 			}
 			totalPoints+=score
 		});
 		var _total=list.find('.totalScore');
-		if(!_total[0])_total=$('<span class="totalScore">').insertAfter(list.find('.list-header h2'));
+		if(!_total[0])_total=$('<span class="totalScore">').insertBefore(list.find('.list-header h2'));
 		_total.text(totalPoints>0?totalPoints:'')
 	})
 };
