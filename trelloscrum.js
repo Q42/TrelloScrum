@@ -1,7 +1,7 @@
 //TrelloScrum - https://github.com/marcelduin/TrelloScrum
 //Adds Scrum to your Trello
 //Project by Jasper Kaizer <jasper@q42.nl> & Marcel Duin <marcel@q42.nl>
-function scoreCards() {
+function scoreCards(){
 	$('div.list').each(function(){
 		var list=$(this);
 		var totalPoints=0;
@@ -21,8 +21,8 @@ function scoreCards() {
 		if(!_total[0])_total=$('<span class="totalScore">').insertBefore(list.find('.list-header h2'));
 		_total.text(totalPoints>0?totalPoints:'')
 	})
-};
-$(function periodical() {
+}
+$(function periodical(){
 	scoreCards();
 	setTimeout(periodical,1000)
-});
+})
