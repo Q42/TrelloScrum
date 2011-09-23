@@ -2,16 +2,13 @@
 	"name": "Trello Scrum",
 	"version": "1.0",
 	"description": "Adds Scrum to your Trello",
-	"browser_action": {
-		"default_icon": "icon.png"
-	},
 	"icons": {
 		"16": "icon.png",
 		"32": "icon32.png"
 	},
 	"content_scripts": [
 		{
-			"matches": ["https://trello.com/board/*"],
+			"matches": ["https://trello.com/*"],
 			"js": ["jquery-1.6.2.min.js","trelloscrum.js"],
 			"css": ["trelloscrum.css"]
 		}
