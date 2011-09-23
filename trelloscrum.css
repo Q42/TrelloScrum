@@ -1,4 +1,4 @@
-.totalScore {
+.totalScore,.tot {
 	color: #006580;
 	font-size: 16px;
 	font-weight: bold;
@@ -11,7 +11,7 @@
 	margin-right: 0 !important;
 	vertical-align: -4px;
 }
-.subTotal {
+.subTotal,.stot {
 	font-weight: bold;
 	position: absolute;
 	right: 5px;
