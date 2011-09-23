@@ -9,7 +9,7 @@
 	"content_scripts": [
 		{
 			"matches": ["https://trello.com/*"],
-			"js": ["jquery-1.6.2.min.js","trelloscrum.min.js"],
+			"js": ["jquery-1.2.min.js","trelloscrum.min.js"],
 			"css": ["trelloscrum.css"]
 		}
 	]
