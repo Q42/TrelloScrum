@@ -17,7 +17,7 @@ Or, clone this repository and load the TrelloScrum folder as an unpacked extensi
 How does it work?
 -----------------
 In the card titles you can add the storypoints between parentheses. The assigned points
-will be picked up by TrelloScrum and displayed in the lower right corner of the card.
+will be picked up by TrelloScrum and displayed in the upper right corner of the card.
 
 For each list the total amount of story points will be calculated and shown in the title
 of the list.
