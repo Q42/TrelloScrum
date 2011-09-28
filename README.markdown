@@ -24,3 +24,8 @@ of the list.
 
 Every second the story points will be detected and calculated. So changing a number or moving
 a card will be reflected almost immediately.
+
+Credits
+-------
+TrelloScrum was developed by [Marcel Duin](http://webglmarcel.q42.net/) and [Jasper Kaizer](https://twitter.com/jkaizer)
+during our pet projects time at [Q42](http://q42.com).

@@ -1,11 +1,7 @@
 {
 	"name": "Trello Scrum",
-	"version": "1.0",
+	"version": "0.1",
 	"description": "Adds Scrum to your Trello",
-	"icons": {
-		"16": "icon.png",
-		"32": "icon32.png"
-	},
 	"content_scripts": [
 		{
 			"matches": ["https://trello.com/*"],
