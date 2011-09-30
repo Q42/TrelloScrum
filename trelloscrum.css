@@ -11,14 +11,15 @@
 	margin-right: 0 !important;
 	vertical-align: -4px;
 }
+.list-card-wrapper:hover .stot {
+	right: 25px;
+}
 .subTotal,.stot {
 	font-weight: bold;
 	position: absolute;
 	right: 5px;
-	top: 2px;
+	top: 6px;
 }
 .card-operation.js-card-menu {
-	background: #fff;
 	z-index: 2;
 }
-
