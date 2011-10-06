@@ -23,3 +23,9 @@
 .card-operation.js-card-menu {
 	z-index: 2;
 }
+
+.point-icon {
+	color:white;
+	text-indent:0 !important;
+	font-weight:bold;
+}
