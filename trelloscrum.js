@@ -10,11 +10,9 @@ function scoreCards(){
             var found =false;
             card.find('.list-card-title a').each(function(){
                 var title=$(this);
-                var score=title[0].s||0;
-                // added decimal support
                 point=Number(title.text().replace(/^.*\((\d*\.?\d+)\).*$/,'$1'));
-                if(!isNaN(point)&&point!=score){
-                    title.text(title.text().replace(/\(\d*\.?\d+\)\s?/,''))[0].score=score=point;
+                if(!isNaN(point)){
+                    title.text(title.text().replace(/\(\d*\.?\d+\)\s?/,''));
                     found=true;
                 }
             });
