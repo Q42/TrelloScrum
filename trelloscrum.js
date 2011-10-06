@@ -15,9 +15,16 @@ function scoreCards(){
                     title.text(title.text().replace(/\(\d*\.?\d+\)\s?/,''));
                     found=true;
                 }
+                
+                // Look for unknown points cards through inclusion of (?) in title
+                if(!found){
+                    point=title.text().replace(/^.*\((\?)\).*$/,'$1');
+                    title.text(title.text().replace(/\((\?)\)\s?/,''));
+		    if('?'==point) found=true;
+		}
             });
-            // changed display of points to be a badge rather than in the title.  fixes hiding of points in smaller window view of trello
-            if(found && !isNaN(point)) {
+            // If a Point is found whether numeric or unkown add a badge
+            if(found)) {
                 card.find('.badges').each(function() {
                     var badge='<div class="badge"><span class="app-icon small-icon light point-icon badge-image">P</span><div class="badge-count point-count">'+point+'</div></div>';
                     $(this).append(badge);
