@@ -29,3 +29,10 @@
 	text-indent:0 !important;
 	font-weight:bold;
 }
+
+.badge-points {
+  background: #7EC569 url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAAfCAYAAADN/hxhAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAADZJREFUeNp0xgkGADAQBMFs7uv/350IEdaYpikDEG728faIGomQNQqhajRC1xiEqbEI2+EIMACyIAbU7Y897gAAAABJRU5ErkJggg==) bottom left repeat-x !important;
+  padding: 0px 5px !important;
+  color: white;
+  font-weight:bold;
+}

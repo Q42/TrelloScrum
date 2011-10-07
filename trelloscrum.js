@@ -27,7 +27,7 @@ function scoreCards(){
             });
             if(found) {
                 card.find('.badges').each(function() {
-                    var badge='<div class="badge"><span class="app-icon small-icon light point-icon badge-image">P</span><div class="badge-count point-count">'+point+'</div></div>';
+                    var badge='<div class="badge badge-points point-count">'+point+'</div>';
                     $(this).append(badge);
                 });
             }
