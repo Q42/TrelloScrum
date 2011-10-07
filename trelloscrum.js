@@ -1,6 +1,11 @@
 //TrelloScrum - https://github.com/marcelduin/TrelloScrum
 //Adds Scrum to your Trello
 //Project by Jasper Kaizer <jasper@q42.nl> & Marcel Duin <marcel@q42.nl>
+
+function showPicker(badge){
+
+}
+
 function scoreCards(){
     var filtered=$('.js-filter-cards').hasClass('is-on');
     $('div.list').each(function(){
@@ -27,7 +32,7 @@ function scoreCards(){
             });
             if(found) {
                 card.find('.badges').each(function() {
-                    var badge='<div class="badge badge-points point-count">'+point+'</div>';
+                    var badge='<div class="badge badge-points point-count" onclick="javascript:showPicker(this);">'+point+'</div>';
                     $(this).append(badge);
                 });
             }
@@ -50,6 +55,15 @@ function scoreCards(){
 }
 
 $(function periodical(){
-	scoreCards();
-	setTimeout(periodical,1000)
+    scoreCards();
+    setTimeout(periodical,1000)
 })
+
+$(document).ready(function() {
+    var pickers = "";
+    for (var i=0; i<=5; i++){
+        pickers += '<span class="point-value">' + i + '</span> ';
+    }
+    var picker = "<div id='point-picker'>" + pickers + "</div>";
+    $("body").append(picker);
+});

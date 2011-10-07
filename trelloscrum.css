@@ -1,38 +1,51 @@
 .totalScore,.tot {
-	color: #006580;
-	font-size: 16px;
-	font-weight: bold;
-	float: right;
-	margin: 4px 5px 0 0;
+    color: #006580;
+    font-size: 16px;
+    font-weight: bold;
+    float: right;
+    margin: 4px 5px 0 0;
 }
 .list-title h2 {
-	float: none !important;
-	display: inline !important;
-	margin-right: 0 !important;
-	vertical-align: -4px;
+    float: none !important;
+    display: inline !important;
+    margin-right: 0 !important;
+    vertical-align: -4px;
 }
 .list-card-wrapper:hover .stot {
-	right: 25px;
+    right: 25px;
 }
 .subTotal,.stot {
-	font-weight: bold;
-	position: absolute;
-	right: 5px;
-	top: 6px;
+    font-weight: bold;
+    position: absolute;
+    right: 5px;
+    top: 6px;
 }
 .card-operation.js-card-menu {
-	z-index: 2;
+    z-index: 2;
 }
 
 .point-icon {
-	color:white;
-	text-indent:0 !important;
-	font-weight:bold;
+    color:white;
+    text-indent:0 !important;
+    font-weight:bold;
 }
 
 .badge-points {
-  background: #7EC569 url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAAfCAYAAADN/hxhAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAADZJREFUeNp0xgkGADAQBMFs7uv/350IEdaYpikDEG728faIGomQNQqhajRC1xiEqbEI2+EIMACyIAbU7Y897gAAAABJRU5ErkJggg==) bottom left repeat-x !important;
-  padding: 0px 5px !important;
-  color: white;
-  font-weight:bold;
+    background: #7EC569 url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAAfCAYAAADN/hxhAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAADZJREFUeNp0xgkGADAQBMFs7uv/350IEdaYpikDEG728faIGomQNQqhajRC1xiEqbEI2+EIMACyIAbU7Y897gAAAABJRU5ErkJggg==) bottom left repeat-x !important;
+    padding: 0px 5px !important;
+    color: white;
+    font-weight:bold;
+}
+
+#point-picker {
+    position:absolute;
+    left:50px;
+    top:50px;
+}
+
+.point-value {
+    background: #ccc; url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAAfCAYAAADN/hxhAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAADZJREFUeNp0xgkGADAQBMFs7uv/350IEdaYpikDEG728faIGomQNQqhajRC1xiEqbEI2+EIMACyIAbU7Y897gAAAABJRU5ErkJggg==) bottom left repeat-x !important;
+    padding: 0px 5px !important;
+    color: white;
+    font-weight:bold;
 }
