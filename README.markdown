@@ -29,3 +29,10 @@ Credits
 -------
 TrelloScrum was developed by [Marcel Duin](http://webglmarcel.q42.net/) and [Jasper Kaizer](https://twitter.com/jkaizer)
 during our pet projects time at [Q42](http://q42.com).
+
+Great improvements made by @nicpottier and @paullofte:
+* The point value is moved to be a badge on the card.
+* Added support for Zero Point Cards (0), Unknown Point Cards (?), Decimal Value Cards (.5)
+* In addition I added the functionality to have the list total reflect the current filtered set of cards.
+
+
