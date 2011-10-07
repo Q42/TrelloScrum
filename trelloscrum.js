@@ -112,6 +112,3 @@ $(function periodical(){
 
     setTimeout(periodical,1000)
 })
-
-$(document).ready(function() {
-});
