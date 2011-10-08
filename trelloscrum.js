@@ -26,7 +26,6 @@
 ** v0.1
 ** - Initial release
 **
-**
 ** Bugs:
 ** - When deleting storypoints, it takes F5 to recalc
 **
@@ -34,7 +33,7 @@
 
 $(function(){
 	//watch filtering
-	$('.js-filter-cards').bind('DOMSubtreeModified',calcPoints);
+	$('.js-filter-cards').live('DOMSubtreeModified',calcPoints);
 
 	//want: trello events
 	(function periodical(){
@@ -68,6 +67,7 @@ function listCard(e){
 	var points=-1;
 	var that=this;
 	var $card=$(this);
+	var $badge=$('<span class="badge badge-points point-count">');
 
 	if($card.hasClass('placeholder'))return;
 
@@ -78,8 +78,6 @@ function listCard(e){
 			printBadge();
 		}
 	});
-
-	var $badge=$('<span class="badge badge-points point-count">');
 
 	function printBadge(){
 		if($(that).parent()[0])$badge.insertBefore($(that).find('.badges').first())
