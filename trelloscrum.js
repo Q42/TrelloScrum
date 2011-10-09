@@ -10,7 +10,7 @@
 ** Paul Lofte <https://github.com/paullofte>
 ** Nic Pottier <https://github.com/nicpottier>
 **
-** Changelog
+** Changelog:
 **
 ** v0.3
 ** - Now event-driven, much faster response
@@ -49,7 +49,7 @@ function list(e){
 	this.list=true;
 
 	var $list=$(this);
-	var $total=$('<span class="scrumTotal">')
+	var $total=$('<span class="list-total">')
 		.appendTo($list.find('.list-header h2'));
 
 	this.calc = function(){
@@ -59,7 +59,7 @@ function list(e){
 	};
 }
 
-//.card-list pseudo
+//.list-card pseudo
 function listCard(e){
 	if(this.scrumCard)return;
 	this.scrumCard=true;
@@ -72,19 +72,18 @@ function listCard(e){
 	if($card.hasClass('placeholder'))return;
 
 	$card.bind('DOMNodeInserted',function(e){
-		var nlist=$(that).closest('.list')[0];
-		if(e.target==that&&nlist){
+		if(e.target==that&&$card.closest('.list')[0]){
 			getPoints();
 			printBadge();
 		}
 	});
 
 	function printBadge(){
-		if($(that).parent()[0])$badge.insertBefore($(that).find('.badges').first())
+		if($card.parent()[0])$badge.insertBefore($card.find('.badges').first())
 	};
 
 	function getPoints(){
-		var $title=$(that).find('.list-card-title a');
+		var $title=$card.find('.list-card-title a');
 
 		//accepts digits, decimals and question mark
 		var parsed=$title.text().replace(/^.*\((\?|\d*\.?\d+)\).*$/,'$1');
