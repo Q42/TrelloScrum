@@ -26,21 +26,23 @@
 ** v0.1
 ** - Initial release
 **
-** Bugs:
-** - When deleting storypoints, it takes F5 to recalc
-**
 */
+
+var filtered=false;
 
 $(function(){
 	//watch filtering
-	$('.js-filter-cards').live('DOMSubtreeModified',calcPoints);
+	$('.js-filter-cards').live('DOMSubtreeModified',function(){
+		filtered=$('.js-filter-cards').hasClass('is-on');
+		calcPoints()
+	});
 
 	//want: trello events
 	(function periodical(){
 		$('.list').each(list);
 		$('.list-card').each(listCard);
 		setTimeout(periodical,1000)
-	})();
+	})()
 });
 
 //.list pseudo
@@ -55,57 +57,47 @@ function list(e){
 	this.calc = function(){
 		var score=0;
 		$list.find('.list-card').each(function(){if(this.points)score+=this.points});
-		$total.text(score>0?score:'');
-	};
-}
+		$total.text(score>0?score:'')
+	}
+};
 
 //.list-card pseudo
 function listCard(e){
-	if(this.scrumCard)return;
-	this.scrumCard=true;
+	if(this.listCard)return;
+	this.listCard=true;
 
-	var points=-1;
-	var that=this;
-	var $card=$(this);
-	var $badge=$('<span class="badge badge-points point-count">');
+	var points=-1,
+		that=this,
+		$card=$(this),
+		$badge=$('<span class="badge badge-points point-count">');
 
 	if($card.hasClass('placeholder'))return;
 
 	$card.bind('DOMNodeInserted',function(e){
-		if(e.target==that&&$card.closest('.list')[0]){
-			getPoints();
-			printBadge();
-		}
+		if(e.target==that&&$card.closest('.list')[0])getPoints()
 	});
 
 	function printBadge(){
-		if($card.parent()[0])$badge.insertBefore($card.find('.badges').first())
+		if($card.parent()[0])$badge.text(that.points).insertBefore($card.find('.badges').first())
 	};
 
 	function getPoints(){
 		var $title=$card.find('.list-card-title a');
-
-		//accepts digits, decimals and question mark
-		var parsed=$title.text().replace(/^.*\((\?|\d*\.?\d+)\).*$/,'$1');
-
-		if((!isNaN(Number(parsed))&&parsed>=0)||parsed=='?'){
-			points=parsed;
-			$badge.text(points);
-			$title[0].otitle=$title.text();
-			$title.text($title.text().replace(/\((\?|\d*\.?\d+)\)\s?/,''));
-		}
-
+		var title=$title.text();
+		points=($title[0].otitle||title).replace(/^.*\((\?|\d*\.?\d+)\).*$/,'$1');
+		if(points!=title)$title[0].otitle=title;
+		$title.text($title.text().replace(/\((\?|\d*\.?\d+)\)\s?/,''));
 		calcPoints();
+		printBadge()
 	};
 
 	this.__defineGetter__('points',function(){
 		//don't add to total when filtered out
-		var filtered=$('.js-filter-cards').hasClass('is-on');
-		return (!filtered||$card.css('opacity')==1)&&points>=0?Number(points):0
+		//also accept question mark
+		return (!filtered||$card.css('opacity')==1)&&(points>=0||points=='?')?Number(points):''
 	});
 
-	getPoints();
-	printBadge();
+	getPoints()
 };
 
 //forcibly calculate list totals
