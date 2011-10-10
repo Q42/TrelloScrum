@@ -77,18 +77,14 @@ function listCard(e){
 		if(e.target==that&&$card.closest('.list')[0])getPoints()
 	});
 
-	function printBadge(){
-		if($card.parent()[0])$badge.text(that.points).insertBefore($card.find('.badges').first())
-	};
-
 	function getPoints(){
 		var $title=$card.find('.list-card-title a');
 		var title=$title.text();
 		points=($title[0].otitle||title).replace(/^.*\((\?|\d*\.?\d+)\).*$/,'$1');
 		if(points!=title)$title[0].otitle=title;
 		$title.text($title.text().replace(/\((\?|\d*\.?\d+)\)\s?/,''));
-		calcPoints();
-		printBadge()
+		if($card.parent()[0])$badge.text(that.points).insertBefore($card.find('.badges').first());
+		calcPoints()
 	};
 
 	this.__defineGetter__('points',function(){
