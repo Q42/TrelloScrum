@@ -56,7 +56,7 @@ function list(e){
 
 	this.calc = function(){
 		var score=0;
-		$list.find('.list-card').each(function(){if(this.points)score+=this.points});
+		$list.find('.list-card').each(function(){if(!isNaN(Number(this.points)))score+=Number(this.points)});
 		$total.text(score>0?score:'')
 	}
 };
@@ -94,7 +94,7 @@ function listCard(e){
 	this.__defineGetter__('points',function(){
 		//don't add to total when filtered out
 		//also accept question mark
-		return (!filtered||$card.css('opacity')==1)&&(points>=0||points=='?')?Number(points):''
+		return (!filtered||$card.css('opacity')==1)&&(points>=0||points=='?')?points:''
 	});
 
 	getPoints()
