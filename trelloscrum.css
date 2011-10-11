@@ -6,16 +6,29 @@
 	margin: 3px 5px 0 0;
 }
 .list-title h2 {
-	float: none !important;
-	display: inline !important;
-	margin-right: 0 !important;
-	vertical-align: -4px;
+    float: none !important;
+    display: inline !important;
+    margin-right: 0 !important;
+    vertical-align: -4px;
 }
 .badge-points {
-  background: #7EC569 url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAAfCAYAAADN/hxhAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAADZJREFUeNp0xgkGADAQBMFs7uv/350IEdaYpikDEG728faIGomQNQqhajRC1xiEqbEI2+EIMACyIAbU7Y897gAAAABJRU5ErkJggg==) bottom left repeat-x !important;
-  padding: 0px 5px !important;
-  color: white;
-  font-weight:bold;
+    background: #7EC569 url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAAfCAYAAADN/hxhAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAADZJREFUeNp0xgkGADAQBMFs7uv/350IEdaYpikDEG728faIGomQNQqhajRC1xiEqbEI2+EIMACyIAbU7Y897gAAAABJRU5ErkJggg==) bottom left repeat-x !important;
+    padding: 0px 5px !important;
+    color: white;
+    font-weight:bold;
+}
+
+#point-picker {
+    position:absolute;
+    left:50px;
+    top:50px;
+}
+
+.point-value {
+    background: #ccc; url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAAfCAYAAADN/hxhAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAADZJREFUeNp0xgkGADAQBMFs7uv/350IEdaYpikDEG728faIGomQNQqhajRC1xiEqbEI2+EIMACyIAbU7Y897gAAAABJRU5ErkJggg==) bottom left repeat-x !important;
+    padding: 0px 5px !important;
+    color: white;
+    font-weight:bold;
 }
 .badge-points:empty {
 	display: none;
