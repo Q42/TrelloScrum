@@ -100,4 +100,3 @@ function listCard(e){
 function calcPoints(){
 	$('.list').each(function(){if(this.calc)this.calc()})
 };
-
