@@ -26,6 +26,7 @@
 ** v0.1
 ** - Initial release
 **
+**
 */
 
 var filtered=false;
@@ -41,6 +42,7 @@ $(function(){
 	(function periodical(){
 		$('.list').each(list);
 		$('.list-card').each(listCard);
+		showPointPicker();
 		setTimeout(periodical,1000)
 	})()
 });
@@ -101,3 +103,39 @@ function listCard(e){
 function calcPoints(){
 	$('.list').each(function(){if(this.calc)this.calc()})
 };
+
+var _pointSeq = [1, 2, 3, 5, 8, 13, 20];
+
+function showPointPicker() {
+	if ($(".card-detail-title .edit-controls").length > 0  && $(".card-detail-title .edit-controls .picker").length == 0){
+		var pickers = '<span class="point-value">?</span> ';
+		for (var i=0; i < _pointSeq.length; i++)
+			pickers += '<span class="point-value">' + _pointSeq[i] + '</span> ';
+    	
+    	var picker = "<div class='picker'>" + pickers + "</div>";
+		$(".card-detail-title .edit-controls").append(picker);
+		$(".point-value").click(updatePoint);
+    }
+}
+
+function updatePoint(){
+    var value = $(this).text();
+    var text = $(".card-detail-title .edit textarea").val();
+    $(".card-detail-title .edit textarea").remove();
+
+    // replace our new 
+    if (text.match(/^.*\((\?|\d*\.?\d+)\).*$/)) {
+    	text = text.replace(/\((\?|\d*\.?\d+)\)/, '('+value+')');
+    } else {
+    	text = '('+value+') ' + text;
+    }
+		
+ 
+    // total hackery to get Trello to acknowledge our new value
+    $(".card-detail-title .edit").prepend('<textarea type="text" class="field single-line" style="height: 42px; ">' + text + '</textarea>');
+
+    // then click our button so it all gets saved away
+    $(".card-detail-title .edit .js-save-edit").click();
+    calcPoints();
+}
+
