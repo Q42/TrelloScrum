@@ -26,7 +26,6 @@
 ** v0.1
 ** - Initial release
 **
-**
 */
 
 var filtered=false;
@@ -78,6 +77,7 @@ function listCard(e){
 	$card.bind('DOMNodeInserted',function(e){
 		if(e.target==that&&$card.closest('.list')[0])getPoints()
 	});
+
 
 	function getPoints(){
 		var $title=$card.find('.list-card-title a');
@@ -138,4 +138,3 @@ function updatePoint(){
     $(".card-detail-title .edit .js-save-edit").click();
     calcPoints();
 }
-
