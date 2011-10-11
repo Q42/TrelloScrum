@@ -96,6 +96,7 @@ function listCard(e){
 	getPoints()
 };
 
+
 //forcibly calculate list totals
 function calcPoints(){
 	$('.list').each(function(){if(this.calc)this.calc()})
