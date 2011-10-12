@@ -12,7 +12,7 @@
     vertical-align: -4px;
 }
 .badge-points {
-    background: #7EC569 url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAAfCAYAAADN/hxhAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAADZJREFUeNp0xgkGADAQBMFs7uv/350IEdaYpikDEG728faIGomQNQqhajRC1xiEqbEI2+EIMACyIAbU7Y897gAAAABJRU5ErkJggg==) bottom left repeat-x !important;
+    background-color: #006580 !important;
     padding: 0px 5px !important;
     color: white;
     font-weight:bold;
@@ -24,7 +24,8 @@
 }
 
 .point-value {
-    background: #7EC569; url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAAfCAYAAADN/hxhAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAADZJREFUeNp0xgkGADAQBMFs7uv/350IEdaYpikDEG728faIGomQNQqhajRC1xiEqbEI2+EIMACyIAbU7Y897gAAAABJRU5ErkJggg==) bottom left repeat-x !important;
+    background-color: #006580 !important;
+    border-radius: 3px;
     padding: 2px 5px !important;
     font-size: 15px !important;
     color: white;

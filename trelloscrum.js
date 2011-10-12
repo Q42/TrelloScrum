@@ -14,6 +14,7 @@
 **
 ** v0.3
 ** - Now event-driven, much faster response
+** - Includes story point picker
 ** - JS rewrite
 ** - Small bugfixes
 **
@@ -29,6 +30,9 @@
 */
 
 var filtered=false;
+
+//parse regexp- accepts digits, decimals and '?'
+var reg=/\((\x3f|\d*\.?\d+)\)\s?/m;
 
 $(function(){
 	//watch filtering
@@ -82,16 +86,16 @@ function listCard(e){
 	function getPoints(){
 		var $title=$card.find('.list-card-title a');
 		var title=$title.text();
-		points=($title[0].otitle||title).replace(/^.*\((\?|\d*\.?\d+)\).*$/,'$1');
+		var parsed=($title[0].otitle||title).match(reg);
+		points=parsed?parsed[1]:title;
 		if(points!=title)$title[0].otitle=title;
-		$title.text($title.text().replace(/\((\?|\d*\.?\d+)\)\s?/,''));
-		if($card.parent()[0])$badge.text(that.points).insertBefore($card.find('.badges').first());
+		$title.text($title.text().replace(reg,''));
+		if($card.parent()[0])$badge.text(that.points).prependTo($card.find('.badges'));
 		calcPoints()
 	};
 
 	this.__defineGetter__('points',function(){
 		//don't add to total when filtered out
-		//also accept question mark
 		return (!filtered||$card.css('opacity')==1)&&(points>=0||points=='?')?points:''
 	});
 
@@ -111,30 +115,25 @@ function showPointPicker() {
 		var pickers = '<span class="point-value">?</span> ';
 		for (var i=0; i < _pointSeq.length; i++)
 			pickers += '<span class="point-value">' + _pointSeq[i] + '</span> ';
-    	
-    	var picker = "<div class='picker'>" + pickers + "</div>";
+
+		var picker = "<div class='picker'>" + pickers + "</div>";
 		$(".card-detail-title .edit-controls").append(picker);
 		$(".point-value").click(updatePoint);
-    }
+	}
 }
 
 function updatePoint(){
-    var value = $(this).text();
-    var text = $(".card-detail-title .edit textarea").val();
-    $(".card-detail-title .edit textarea").remove();
+	var value = $(this).text();
+	var text = $(".card-detail-title .edit textarea").val();
+	$(".card-detail-title .edit textarea").remove();
 
-    // replace our new 
-    if (text.match(/^.*\((\?|\d*\.?\d+)\).*$/)) {
-    	text = text.replace(/\((\?|\d*\.?\d+)\)/, '('+value+')');
-    } else {
-    	text = '('+value+') ' + text;
-    }
-		
- 
-    // total hackery to get Trello to acknowledge our new value
-    $(".card-detail-title .edit").prepend('<textarea type="text" class="field single-line" style="height: 42px; ">' + text + '</textarea>');
+	// replace our new
+	text = text.match(reg)?text.replace(reg, '('+value+')'):'('+value+') ' + text;
 
-    // then click our button so it all gets saved away
-    $(".card-detail-title .edit .js-save-edit").click();
-    calcPoints();
+	// total hackery to get Trello to acknowledge our new value
+	$(".card-detail-title .edit").prepend('<textarea type="text" class="field single-line" style="height: 42px; ">' + text + '</textarea>');
+
+	// then click our button so it all gets saved away
+	$(".card-detail-title .edit .js-save-edit").click();
+	calcPoints();
 }
