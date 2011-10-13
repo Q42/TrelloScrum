@@ -44,11 +44,30 @@ $(function(){
 	//for storypoint picker
 	$(".card-detail-title .edit-controls").live('DOMNodeInserted',showPointPicker);
 
+	//about-screen
+	$('.manual').live('DOMNodeInserted',function(){
+		var $manual = $(this);
+		var $sidebar = $manual.children('.window-sidebar');
+		if($sidebar.find('.ts-about').length)return;
+		var $content = $manual.children('.window-main-col');
+		var $part = $('<div class="sidebar-nav mini window-module ts-about">').appendTo($sidebar);
+		var $h3 = $('<h3>Trello Scrum</h3>').appendTo($part);
+		var $ul = $('<ul>').appendTo($part);
+		var $abt = $('<a href="#">').text('Help').appendTo($('<li>').appendTo($ul));
+		$abt.click(function(){
+			$.get(chrome.extension.getURL("help.html"), function(d){
+				$sidebar.find('.active').removeClass('active');
+				$abt.addClass('active');
+				$manual.children('.window-header').children('.window-title').text($(d.getElementsByTagName('title')).text());
+				$manual.children('.window-main-col').empty().append($(d.getElementsByTagName('body')).children())
+			})
+		})
+	});
+
 	//want: trello events
 	(function periodical(){
 		$('.list').each(list);
 		$('.list-card').each(listCard);
-		//showPointPicker();
 		setTimeout(periodical,1000)
 	})()
 });

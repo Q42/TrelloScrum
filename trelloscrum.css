@@ -5,11 +5,14 @@
 	float: right;
 	margin: 3px 5px 0 0;
 }
-.list-title h2 {
+.list .list-title h2 {
     float: none !important;
     display: inline !important;
     margin-right: 0 !important;
     vertical-align: -4px;
+}
+.window-main-col p, .window-main-col h2 {
+	display: block !important;
 }
 .badge-points {
     background-color: #006580 !important;
