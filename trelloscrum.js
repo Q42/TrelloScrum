@@ -41,11 +41,14 @@ $(function(){
 		calcPoints()
 	});
 
+	//for storypoint picker
+	$(".card-detail-title .edit-controls").live('DOMNodeInserted',showPointPicker);
+
 	//want: trello events
 	(function periodical(){
 		$('.list').each(list);
 		$('.list-card').each(listCard);
-		showPointPicker();
+		//showPointPicker();
 		setTimeout(periodical,1000)
 	})()
 });
@@ -111,15 +114,15 @@ function calcPoints(){
 var _pointSeq = [1, 2, 3, 5, 8, 13, 20];
 
 function showPointPicker() {
-	if ($(".card-detail-title .edit-controls").length > 0  && $(".card-detail-title .edit-controls .picker").length == 0){
-		var pickers = '<span class="point-value">?</span> ';
-		for (var i=0; i < _pointSeq.length; i++)
-			pickers += '<span class="point-value">' + _pointSeq[i] + '</span> ';
+	if($(this).find('.picker').length)return;
 
-		var picker = "<div class='picker'>" + pickers + "</div>";
-		$(".card-detail-title .edit-controls").append(picker);
-		$(".point-value").click(updatePoint);
-	}
+	var pickers = '<span class="point-value">?</span> ';
+	for (var i=0; i < _pointSeq.length; i++)
+		pickers += '<span class="point-value">' + _pointSeq[i] + '</span> ';
+
+	var picker = "<div class='picker'>" + pickers + "</div>";
+	$(".card-detail-title .edit-controls").append(picker);
+	$(".point-value").click(updatePoint);
 }
 
 function updatePoint(){
