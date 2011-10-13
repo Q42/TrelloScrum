@@ -11,7 +11,7 @@
     margin-right: 0 !important;
     vertical-align: -4px;
 }
-.window-main-col p, .window-main-col h2 {
+.manual .window-main-col p, .window-main-col h2 {
 	display: block !important;
 }
 .badge-points {
