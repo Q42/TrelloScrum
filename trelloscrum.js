@@ -14,6 +14,7 @@
 **
 ** v0.3
 ** - Now event-driven, much faster response
+** - Added help page to trello manual
 ** - Includes story point picker
 ** - JS rewrite
 ** - Small bugfixes
@@ -29,6 +30,7 @@
 **
 */
 
+//watch for filtered cards
 var filtered=false;
 
 //parse regexp- accepts digits, decimals and '?'
@@ -49,9 +51,8 @@ $(function(){
 		var $manual = $(this);
 		var $sidebar = $manual.children('.window-sidebar');
 		if($sidebar.find('.ts-about').length)return;
-		var $content = $manual.children('.window-main-col');
 		var $part = $('<div class="sidebar-nav mini window-module ts-about">').appendTo($sidebar);
-		var $h3 = $('<h3>Trello Scrum</h3>').appendTo($part);
+		$('<h3>Trello Scrum</h3>').appendTo($part);
 		var $ul = $('<ul>').appendTo($part);
 		var $abt = $('<a href="#">').text('Help').appendTo($('<li>').appendTo($ul));
 		$abt.click(function(){
@@ -94,6 +95,7 @@ function listCard(e){
 	this.listCard=true;
 
 	var points=-1,
+		parsed,
 		that=this,
 		$card=$(this),
 		$badge=$('<span class="badge badge-points point-count">');
@@ -104,11 +106,10 @@ function listCard(e){
 		if(e.target==that&&$card.closest('.list')[0])getPoints()
 	});
 
-
 	function getPoints(){
 		var $title=$card.find('.list-card-title a');
 		var title=$title.text();
-		var parsed=($title[0].otitle||title).match(reg);
+		parsed=($title[0].otitle||title).match(reg);
 		points=parsed?parsed[1]:title;
 		if(points!=title)$title[0].otitle=title;
 		$title.text($title.text().replace(reg,''));
@@ -118,19 +119,18 @@ function listCard(e){
 
 	this.__defineGetter__('points',function(){
 		//don't add to total when filtered out
-		return (!filtered||$card.css('opacity')==1)&&(points>=0||points=='?')?points:''
+		return parsed&&(!filtered||$card.css('opacity')==1)?points:''
 	});
 
 	getPoints()
 };
-
 
 //forcibly calculate list totals
 function calcPoints(){
 	$('.list').each(function(){if(this.calc)this.calc()})
 };
 
-var _pointSeq = [1, 2, 3, 5, 8, 13, 20];
+var _pointSeq = [0, 1, 2, 3, 5, 8, 13, 20];
 
 function showPointPicker() {
 	if($(this).find('.picker').length)return;
