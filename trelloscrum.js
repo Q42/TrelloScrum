@@ -82,6 +82,12 @@ function list(e){
 	var $total=$('<span class="list-total">')
 		.appendTo($list.find('.list-header h2'));
 
+	$total.bind('DOMNodeRemovedFromDocument',function(){
+		setTimeout(function(){
+			$total.appendTo($list.find('.list-header h2'))
+		})
+	});
+
 	this.calc = function(){
 		var score=0;
 		$list.find('.list-card').each(function(){if(!isNaN(Number(this.points)))score+=Number(this.points)});
@@ -108,6 +114,7 @@ function listCard(e){
 
 	function getPoints(){
 		var $title=$card.find('.list-card-title a');
+		if(!$title[0])return;
 		var title=$title.text();
 		parsed=($title[0].otitle||title).match(reg);
 		points=parsed?parsed[1]:title;
@@ -130,6 +137,7 @@ function calcPoints(){
 	$('.list').each(function(){if(this.calc)this.calc()})
 };
 
+//default story point picker sequence
 var _pointSeq = [0, 1, 2, 3, 5, 8, 13, 20];
 
 function showPointPicker() {
@@ -142,7 +150,7 @@ function showPointPicker() {
 	var picker = "<div class='picker'>" + pickers + "</div>";
 	$(".card-detail-title .edit-controls").append(picker);
 	$(".point-value").click(updatePoint);
-}
+};
 
 function updatePoint(){
 	var value = $(this).text();
@@ -158,4 +166,4 @@ function updatePoint(){
 	// then click our button so it all gets saved away
 	$(".card-detail-title .edit .js-save-edit").click();
 	calcPoints();
-}
+};
