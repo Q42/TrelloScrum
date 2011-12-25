@@ -36,6 +36,8 @@ var filtered=false;
 //parse regexp- accepts digits, decimals and '?'
 var reg=/\((\x3f|\d*\.?\d+)\)\s?/m;
 
+var iconUrl = chrome.extension.getURL("storypoints-icon.png");
+
 $(function(){
 	//watch filtering
 	$('.js-filter-cards').live('DOMSubtreeModified',function(){
@@ -104,7 +106,7 @@ function listCard(e){
 		parsed,
 		that=this,
 		$card=$(this),
-		$badge=$('<span class="badge badge-points point-count">');
+		$badge=$('<span class="badge badge-points point-count" style="background-image: url('+iconUrl+') !important;">');
 
 	if($card.hasClass('placeholder'))return;
 
@@ -120,7 +122,10 @@ function listCard(e){
 		points=parsed?parsed[1]:title;
 		if(points!=title)$title[0].otitle=title;
 		$title.text($title.text().replace(reg,''));
-		if($card.parent()[0])$badge.text(that.points).prependTo($card.find('.badges'));
+		if($card.parent()[0]){
+			$badge.text(that.points).prependTo($card.find('.badges'));
+			$badge.attr({title: "This card has "+that.points+" storypoint(s)."})
+		}
 		calcPoints()
 	};
 

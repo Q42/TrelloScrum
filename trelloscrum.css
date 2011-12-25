@@ -5,20 +5,30 @@
 	float: right;
 	margin: 3px 5px 0 0;
 }
+
 .list .list-title h2 {
     float: none !important;
     display: inline !important;
     margin-right: 0 !important;
     vertical-align: -4px;
 }
+
 .manual .window-main-col p, .window-main-col h2 {
 	display: block !important;
 }
+
 .badge-points {
-    background-color: #006580 !important;
-    padding: 0px 5px !important;
-    color: white;
-    font-weight:bold;
+   	background-color: #006580 !important;
+	border-color: #005b72 !important;
+	border-bottom-color: #004b5f !important;
+	color: #c8dfe5 !important;
+	float: right;
+	font-size: 11px;
+	line-height: 16px;
+	padding-right: 4px !important;
+	text-align: right;
+	background-repeat: no-repeat !important;
+	background-position: 2px 2px !important;
 }
 
 .picker {
@@ -34,6 +44,7 @@
     color: white;
     font-weight:bold;
 }
+
 .badge-points:empty {
 	display: none;
 }
