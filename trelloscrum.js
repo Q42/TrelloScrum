@@ -36,7 +36,7 @@ var filtered=false;
 //parse regexp- accepts digits, decimals and '?'
 var reg=/\((\x3f|\d*\.?\d+)\)\s?/m;
 
-var iconUrl = chrome.extension.getURL("storypoints-icon.png");
+var iconUrl = chrome.extension.getURL("images/storypoints-icon.png");
 
 $(function(){
 	//watch filtering
