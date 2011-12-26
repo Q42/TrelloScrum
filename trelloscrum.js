@@ -91,7 +91,8 @@ function list(e){
 	this.calc = function(){
 		var score=0;
 		$list.find('.list-card').each(function(){if(!isNaN(Number(this.points)))score+=Number(this.points)});
-		$total.text(score>0?score:'')
+		var scoreTruncated = Math.floor(score * 100) / 100;
+    	$total.text(scoreTruncated>0?scoreTruncated:'')
 	}
 };
 
