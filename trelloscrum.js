@@ -126,7 +126,7 @@ function listCard(e){
 
 	this.__defineGetter__('points',function(){
 		//don't add to total when filtered out
-		return parsed&&(!filtered||$card.css('opacity')==1)?points:''
+		return parsed&&(filtered && ($card.css('opacity')<1 || $card.css('display')=='none'))?"":points
 	});
 
 	getPoints()
