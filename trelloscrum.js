@@ -49,6 +49,8 @@ $(function(){
 	$(".card-detail-title .edit-controls").live('DOMNodeInserted',showPointPicker);
 
 	//about-screen
+	//disabled for now
+	/*
 	$('.manual').live('DOMNodeInserted',function(){
 		var $manual = $(this);
 		var $sidebar = $manual.children('.window-sidebar');
@@ -65,7 +67,9 @@ $(function(){
 				$manual.children('.window-main-col').empty().append($(d.getElementsByTagName('body')).children())
 			})
 		})
+		
 	});
+	*/
 
 	//want: trello events
 	(function periodical(){
@@ -132,7 +136,7 @@ function listCard(e){
 
 	this.__defineGetter__('points',function(){
 		//don't add to total when filtered out
-		return parsed&&(!filtered||$card.css('opacity')==1)?points:''
+		return parsed&&(!filtered||($card.css('opacity')==1 && $card.css('display')!='none'))?points:''
 	});
 
 	getPoints()
