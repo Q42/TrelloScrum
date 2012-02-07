@@ -1,5 +1,5 @@
 /*
-** TrelloScrum v0.3 - https://github.com/Q42/TrelloScrum
+** TrelloScrum v0.51 - https://github.com/Q42/TrelloScrum
 ** Adds Scrum to your Trello
 **
 ** Orig:
@@ -9,24 +9,9 @@
 ** Contribs:
 ** Paul Lofte <https://github.com/paullofte>
 ** Nic Pottier <https://github.com/nicpottier>
+** Bastiaan Terhorst <https://github.com/bastiaanterhorst>
+** Morgan Craft <https://github.com/mgan59>
 **
-** Changelog:
-**
-** v0.3
-** - Now event-driven, much faster response
-** - Added help page to trello manual
-** - Includes story point picker
-** - JS rewrite
-** - Small bugfixes
-**
-** v0.2
-** - Includes decimal story points
-** - Filtered cards aren't added to list totals
-** - Question mark accepted as story points
-** - Fancier storypoint display
-**
-** v0.1
-** - Initial release
 **
 */
 
@@ -47,29 +32,6 @@ $(function(){
 
 	//for storypoint picker
 	$(".card-detail-title .edit-controls").live('DOMNodeInserted',showPointPicker);
-
-	//about-screen
-	//disabled for now
-	/*
-	$('.manual').live('DOMNodeInserted',function(){
-		var $manual = $(this);
-		var $sidebar = $manual.children('.window-sidebar');
-		if($sidebar.find('.ts-about').length)return;
-		var $part = $('<div class="sidebar-nav mini window-module ts-about">').appendTo($sidebar);
-		$('<h3>Trello Scrum</h3>').appendTo($part);
-		var $ul = $('<ul>').appendTo($part);
-		var $abt = $('<a href="#">').text('Help').appendTo($('<li>').appendTo($ul));
-		$abt.click(function(){
-			$.get(chrome.extension.getURL("help.html"), function(d){
-				$sidebar.find('.active').removeClass('active');
-				$abt.addClass('active');
-				$manual.children('.window-header').children('.window-title').text($(d.getElementsByTagName('title')).text());
-				$manual.children('.window-main-col').empty().append($(d.getElementsByTagName('body')).children())
-			})
-		})
-		
-	});
-	*/
 
 	//want: trello events
 	(function periodical(){
@@ -120,7 +82,7 @@ function listCard(e){
 	});
 
 	function getPoints(){
-		var $title=$card.find('.list-card-title a');
+		var $title=$card.find('a.list-card-title');
 		if(!$title[0])return;
 		var title=$title.text();
 		parsed=($title[0].otitle||title).match(reg);
