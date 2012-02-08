@@ -43,6 +43,7 @@
     font-size: 15px !important;
     color: white;
     font-weight:bold;
+    cursor: pointer;
 }
 
 .badge-points:empty {

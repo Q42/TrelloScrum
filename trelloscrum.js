@@ -1,5 +1,5 @@
 /*
-** TrelloScrum v0.51 - https://github.com/Q42/TrelloScrum
+** TrelloScrum v0.52 - https://github.com/Q42/TrelloScrum
 ** Adds Scrum to your Trello
 **
 ** Orig:
@@ -21,7 +21,7 @@ var filtered=false;
 //parse regexp- accepts digits, decimals and '?'
 var reg=/\((\x3f|\d*\.?\d+)\)\s?/m;
 
-var iconUrl = chrome.extension.getURL("images/storypoints-icon.png");
+var iconUrl = chrome.extension.getURL('images/storypoints-icon.png');
 
 $(function(){
 	//watch filtering
@@ -37,7 +37,7 @@ $(function(){
 	(function periodical(){
 		$('.list').each(list);
 		$('.list-card').each(listCard);
-		setTimeout(periodical,1000)
+		setTimeout(periodical,2000)
 	})()
 });
 
@@ -73,17 +73,19 @@ function listCard(e){
 		parsed,
 		that=this,
 		$card=$(this),
+		busy=false,
 		$badge=$('<span class="badge badge-points point-count" style="background-image: url('+iconUrl+') !important;">');
 
 	if($card.hasClass('placeholder'))return;
 
 	$card.bind('DOMNodeInserted',function(e){
-		if(e.target==that&&$card.closest('.list')[0])getPoints()
+		if(!busy&&$(e.target).hasClass('list-card-title'))setTimeout(getPoints)
 	});
 
 	function getPoints(){
 		var $title=$card.find('a.list-card-title');
 		if(!$title[0])return;
+		busy=true;
 		var title=$title.text();
 		parsed=($title[0].otitle||title).match(reg);
 		points=parsed?parsed[1]:title;
@@ -91,9 +93,10 @@ function listCard(e){
 		$title.text($title.text().replace(reg,''));
 		if($card.parent()[0]){
 			$badge.text(that.points).prependTo($card.find('.badges'));
-			$badge.attr({title: "This card has "+that.points+" storypoint(s)."})
+			$badge.attr({title: 'This card has '+that.points+' storypoint(s).'})
 		}
-		calcPoints()
+		busy=false;
+		calcPoints($card.closest('.list'))
 	};
 
 	this.__defineGetter__('points',function(){
@@ -105,8 +108,8 @@ function listCard(e){
 };
 
 //forcibly calculate list totals
-function calcPoints(){
-	$('.list').each(function(){if(this.calc)this.calc()})
+function calcPoints($el){
+	($el||$('.list')).each(function(){if(this.calc)this.calc()})
 };
 
 //default story point picker sequence
@@ -121,21 +124,19 @@ function showPointPicker() {
 
 	var picker = "<div class='picker'>" + pickers + "</div>";
 	$(".card-detail-title .edit-controls").append(picker);
-	$(".point-value").click(updatePoint);
+	$(".point-value").click(updatePoint)
 };
 
 function updatePoint(){
 	var value = $(this).text();
-	var text = $(".card-detail-title .edit textarea").val();
-	$(".card-detail-title .edit textarea").remove();
+	var $text = $(".card-detail-title .edit textarea");
+	var text = $text.val();
 
 	// replace our new
-	text = text.match(reg)?text.replace(reg, '('+value+')'):'('+value+') ' + text;
-
-	// total hackery to get Trello to acknowledge our new value
-	$(".card-detail-title .edit").prepend('<textarea type="text" class="field single-line" style="height: 42px; ">' + text + '</textarea>');
+	$text[0].value=text.match(reg)?text.replace(reg, '('+value+') '):'('+value+') ' + text;
 
 	// then click our button so it all gets saved away
 	$(".card-detail-title .edit .js-save-edit").click();
-	calcPoints();
+
+	return false
 };
