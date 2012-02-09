@@ -2,8 +2,10 @@
 ** TrelloScrum v0.52 - https://github.com/Q42/TrelloScrum
 ** Adds Scrum to your Trello
 **
-** Orig:
+** Idea & Documentation:
 ** Jasper Kaizer <https://github.com/jkaizer>
+**
+** Orig:
 ** Marcel Duin <https://github.com/marcelduin>
 **
 ** Contribs:
@@ -11,7 +13,6 @@
 ** Nic Pottier <https://github.com/nicpottier>
 ** Bastiaan Terhorst <https://github.com/bastiaanterhorst>
 ** Morgan Craft <https://github.com/mgan59>
-**
 **
 */
 
@@ -60,7 +61,7 @@ function list(e){
 		var score=0;
 		$list.find('.list-card').each(function(){if(!isNaN(Number(this.points)))score+=Number(this.points)});
 		var scoreTruncated = Math.floor(score * 100) / 100;
-    	$total.text(scoreTruncated>0?scoreTruncated:'')
+		$total.text(scoreTruncated>0?scoreTruncated:'')
 	}
 };
 
