@@ -87,11 +87,12 @@ function listCard(e){
 		var $title=$card.find('a.list-card-title');
 		if(!$title[0])return;
 		busy=true;
-		var title=$title.text();
+		var title=$title.html();
+		//alert(title)
 		parsed=($title[0].otitle||title).match(reg);
 		points=parsed?parsed[1]:title;
 		if(points!=title)$title[0].otitle=title;
-		$title.text($title.text().replace(reg,''));
+		$title.html($title.html().replace(reg,''));
 		if($card.parent()[0]){
 			$badge.text(that.points).prependTo($card.find('.badges'));
 			$badge.attr({title: 'This card has '+that.points+' storypoint(s).'})
