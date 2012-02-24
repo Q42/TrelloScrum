@@ -95,7 +95,7 @@ function listCard(e){
 		$title.html($title.html().replace(reg,''));
 		if($card.parent()[0]){
 			$badge.text(that.points).prependTo($card.find('.badges'));
-			$badge.attr({title: 'This card has '+that.points+' storypoint(s).'})
+			$badge.attr({title: 'This card has '+that.points+' storypoint' + (that.points == 1 ? '.' : 's.')})
 		}
 		busy=false;
 		calcPoints($card.closest('.list'))
