@@ -7,10 +7,10 @@
 }
 
 .list .list-title h2 {
-    float: none !important;
-    display: inline !important;
-    margin-right: 0 !important;
-    vertical-align: -4px;
+	float: none !important;
+	display: inline !important;
+	margin-right: 0 !important;
+	vertical-align: -4px;
 }
 
 .manual .window-main-col p, .window-main-col h2 {
@@ -18,32 +18,32 @@
 }
 
 .badge-points {
-   	background-color: #006580 !important;
+	background-color: #006580 !important;
 	border-color: #005b72 !important;
 	border-bottom-color: #004b5f !important;
 	color: #e1fafb !important;
 	float: right;
 	font-size: 11px;
 	line-height: 16px;
-	padding-right: 4px !important;
 	text-align: right;
 	background-repeat: no-repeat !important;
-	background-position: 2px 2px !important;
+	background-position: 3px 3px !important;
+	padding: 0 4px 0 17px !important;
 }
 
 .picker {
-    float: right;
-    padding-top: 5px;
+	float: right;
+	padding-top: 5px;
 }
 
 .point-value {
-    background-color: #006580 !important;
-    border-radius: 3px;
-    padding: 2px 5px !important;
-    font-size: 15px !important;
-    color: white;
-    font-weight:bold;
-    cursor: pointer;
+	background-color: #006580 !important;
+	border-radius: 3px;
+	padding: 2px 5px !important;
+	font-size: 15px !important;
+	color: white;
+	font-weight:bold;
+	cursor: pointer;
 }
 
 .badge-points:empty {

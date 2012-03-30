@@ -1,11 +1,9 @@
 /*
-** TrelloScrum v0.52 - https://github.com/Q42/TrelloScrum
+** TrelloScrum v0.53 - https://github.com/Q42/TrelloScrum
 ** Adds Scrum to your Trello
 **
-** Idea & Documentation:
+** Original:
 ** Jasper Kaizer <https://github.com/jkaizer>
-**
-** Orig:
 ** Marcel Duin <https://github.com/marcelduin>
 **
 ** Contribs:
@@ -75,7 +73,7 @@ function listCard(e){
 		that=this,
 		$card=$(this),
 		busy=false,
-		$badge=$('<span class="badge badge-points point-count" style="background-image: url('+iconUrl+') !important;">');
+		$badge=$('<div class="badge badge-points point-count" style="background-image: url('+iconUrl+')"/>');
 
 	if($card.hasClass('placeholder'))return;
 
@@ -88,7 +86,6 @@ function listCard(e){
 		if(!$title[0])return;
 		busy=true;
 		var title=$title.html();
-		//alert(title)
 		parsed=($title[0].otitle||title).match(reg);
 		points=parsed?parsed[1]:title;
 		if(points!=title)$title[0].otitle=title;
