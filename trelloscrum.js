@@ -11,6 +11,7 @@
 ** Nic Pottier <https://github.com/nicpottier>
 ** Bastiaan Terhorst <https://github.com/bastiaanterhorst>
 ** Morgan Craft <https://github.com/mgan59>
+** Frank Geerlings <https://github.com/frankgeerlings>
 **
 */
 
@@ -22,6 +23,7 @@ var filtered = false, //watch for filtered cards
 	reg = /\((\x3f|\d*\.?\d+)\)\s?/m, //parse regexp- accepts digits, decimals and '?'
 	iconUrl = chrome.extension.getURL('images/storypoints-icon.png');
 
+//what to do when DOM loads
 $(function(){
 	//watch filtering
 	$('.js-filter-cards').live('DOMSubtreeModified',function(){
@@ -111,22 +113,21 @@ function calcPoints($el){
 	($el||$('.list')).each(function(){if(this.calc)this.calc()})
 };
 
+//the story point picker
 function showPointPicker() {
 	if($(this).find('.picker').length) return;
-	$picker = $('<div class="picker">').appendTo('.card-detail-title .edit-controls');
-	for (var i in _pointSeq) $picker.append($('<span class="point-value">').text(_pointSeq[i]).click(updatePoint))
-};
+	var $picker = $('<div class="picker">').appendTo('.card-detail-title .edit-controls');
+	for (var i in _pointSeq) $picker.append($('<span class="point-value">').text(_pointSeq[i]).click(function(){
+		var value = $(this).text();
+		var $text = $('.card-detail-title .edit textarea');
+		var text = $text.val();
 
-function updatePoint(){
-	var value = $(this).text();
-	var $text = $('.card-detail-title .edit textarea');
-	var text = $text.val();
+		// replace our new
+		$text[0].value=text.match(reg)?text.replace(reg, '('+value+') '):'('+value+') ' + text;
 
-	// replace our new
-	$text[0].value=text.match(reg)?text.replace(reg, '('+value+') '):'('+value+') ' + text;
+		// then click our button so it all gets saved away
+		$(".card-detail-title .edit .js-save-edit").click();
 
-	// then click our button so it all gets saved away
-	$(".card-detail-title .edit .js-save-edit").click();
-
-	return false
+		return false
+	}))
 };
