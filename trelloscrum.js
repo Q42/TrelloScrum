@@ -1,5 +1,5 @@
 /*
-** TrelloScrum v0.53 - https://github.com/Q42/TrelloScrum
+** TrelloScrum v0.54 - https://github.com/Q42/TrelloScrum
 ** Adds Scrum to your Trello
 **
 ** Original:
@@ -14,13 +14,13 @@
 **
 */
 
-//watch for filtered cards
-var filtered=false;
+//default story point picker sequence
+var _pointSeq = ['?', 0, 1, 2, 3, 5, 8, 13, 20];
 
-//parse regexp- accepts digits, decimals and '?'
-var reg=/\((\x3f|\d*\.?\d+)\)\s?/m;
-
-var iconUrl = chrome.extension.getURL('images/storypoints-icon.png');
+//internals
+var filtered = false, //watch for filtered cards
+	reg = /\((\x3f|\d*\.?\d+)\)\s?/m, //parse regexp- accepts digits, decimals and '?'
+	iconUrl = chrome.extension.getURL('images/storypoints-icon.png');
 
 $(function(){
 	//watch filtering
@@ -111,24 +111,15 @@ function calcPoints($el){
 	($el||$('.list')).each(function(){if(this.calc)this.calc()})
 };
 
-//default story point picker sequence
-var _pointSeq = [0, 1, 2, 3, 5, 8, 13, 20];
-
 function showPointPicker() {
-	if($(this).find('.picker').length)return;
-
-	var pickers = '<span class="point-value">?</span> ';
-	for (var i=0; i < _pointSeq.length; i++)
-		pickers += '<span class="point-value">' + _pointSeq[i] + '</span> ';
-
-	var picker = "<div class='picker'>" + pickers + "</div>";
-	$(".card-detail-title .edit-controls").append(picker);
-	$(".point-value").click(updatePoint)
+	if($(this).find('.picker').length) return;
+	$picker = $('<div class="picker">').appendTo('.card-detail-title .edit-controls');
+	for (var i in _pointSeq) $picker.append($('<span class="point-value">').text(_pointSeq[i]).click(updatePoint))
 };
 
 function updatePoint(){
 	var value = $(this).text();
-	var $text = $(".card-detail-title .edit textarea");
+	var $text = $('.card-detail-title .edit textarea');
 	var text = $text.val();
 
 	// replace our new
