@@ -1,6 +1,6 @@
 {
 	"name": "Trello Scrum",
-	"version": "0.54",
+	"version": "0.55",
 	"description": "Adds Scrum to your Trello",
 	"content_scripts": [
 		{
@@ -8,5 +8,6 @@
 			"js": ["jquery-1.7.1.min.js","trelloscrum.js"],
 			"css": ["trelloscrum.css"]
 		}
-	]
+	],
+    "icons": { "128": "trello-scrum-icon.png" }
 }
