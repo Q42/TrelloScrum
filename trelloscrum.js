@@ -33,11 +33,13 @@ $(function(){
 
 	//for storypoint picker
 	$(".card-detail-title .edit-controls").live('DOMNodeInserted',showPointPicker);
+	
 
 	//want: trello events
 	(function periodical(){
 		$('.list').each(list);
 		$('.list-card').each(listCard);
+		checkExport();
 		setTimeout(periodical,2000)
 	})()
 });
@@ -131,3 +133,41 @@ function showPointPicker() {
 		return false
 	}))
 };
+
+//for export
+function checkExport() {
+  if($('form').find('.js-export-excel').length) return;
+  if($('form').find('.js-export-json').length) {
+    var excel_btn = $('<a style="margin: 0 4px 4px 0;" class="button js-export-excel" href="#" target="_blank" title="Open downloaded file with Excel">Excel</a>');
+    excel_btn.click(showExcelExport);
+    var $js_btn = $('form').find('.js-export-json');
+    $js_btn.after(excel_btn);
+  } 
+}
+
+function showExcelExport() {
+  json_url = $('form').find('.js-export-json').attr('href');
+  $.getJSON(json_url, function(data) {
+
+  	var s = '<table id="export" border=1>';
+    s += '<tr><th>Points</th><th>Story</th><th>Description</th></tr>';
+    $.each(data['lists'], function(key, list) {
+        list_id = list["id"];
+        s += '<tr><th colspan="3">' + list['name'] + '</th></tr>';
+
+        $.each(data["cards"], function(key, card) {
+          if (card["idList"] == list_id) {
+            title = card["name"];
+            parsed = title.match(reg);
+        		points = parsed?parsed[1]:'';
+        		title = title.replace(reg,'');
+            s += '<tr><td>'+ points + '</td><td>' + title + '</td><td>' + card["desc"] + '</td></tr>';
+          }
+        });  
+        s += '<tr><td colspan=3></td></tr>';
+    });
+    s += '</table>';
+    
+    window.open('data:application/vnd.ms-excel,'+encodeURIComponent(s));
+  });
+}
