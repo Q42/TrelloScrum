@@ -208,14 +208,14 @@ function showExcelExport() {
 		var s = '<table id="export" border=1>';
 		s += '<tr><th>Points</th><th>Story</th><th>Description</th></tr>';
 		$.each(data['lists'], function(key, list) {
-			list_id = list["id"];
+			var list_id = list["id"];
 			s += '<tr><th colspan="3">' + list['name'] + '</th></tr>';
 
 			$.each(data["cards"], function(key, card) {
 				if (card["idList"] == list_id) {
-					title = card["name"];
-					parsed = title.match(reg);
-					points = parsed?parsed[1]:'';
+					var title = card["name"];
+					var parsed = title.match(reg);
+					var points = parsed?parsed[1]:'';
 					title = title.replace(reg,'');
 					s += '<tr><td>'+ points + '</td><td>' + title + '</td><td>' + card["desc"] + '</td></tr>';
 				}
@@ -227,9 +227,9 @@ function showExcelExport() {
 		var bb = new BlobBuilder();
 		bb.append(s);
 		
-		board_title_reg = /.*\/board\/(.*)\//;
-		board_title_parsed = document.location.href.match(board_title_reg);
-		board_title = board_title_parsed[1];
+		var board_title_reg = /.*\/board\/(.*)\//;
+		var board_title_parsed = document.location.href.match(board_title_reg);
+		var board_title = board_title_parsed[1];
 
 		$excel_btn
 			.text('Excel')
