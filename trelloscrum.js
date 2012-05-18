@@ -36,6 +36,15 @@ $(function(){
 	//for storypoint picker
 	$(".card-detail-title .edit-controls").live('DOMNodeInserted',showPointPicker);
 	
+	$('body').bind('DOMSubtreeModified',function(e){
+		if($(e.target).hasClass('list'))
+			readList($(e.target))
+	});
+
+	$('.js-share').live('mouseup',function(){
+		setTimeout(checkExport)
+	});
+
 	function readList($c){
 		$c.each(function(){
 			if(!this.list) new List(this);
@@ -45,16 +54,6 @@ $(function(){
 
 	readList($('.list'));
 
-	$('body').bind('DOMSubtreeModified',function(e){
-		if($(e.target).hasClass('list'))
-			readList($(e.target))
-	});
-
-	//want: trello events
-	(function periodical(){
-		checkExport();
-		setTimeout(periodical,2000)
-	})()
 });
 
 //.list pseudo
@@ -180,6 +179,9 @@ function showPointPicker() {
 
 //for export
 var $excel_btn;
+window.URL = window.webkitURL || window.URL;
+window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
+
 function checkExport() {
 	if($('form').find('.js-export-excel').length) return;
 	var $js_btn = $('form').find('.js-export-json');
@@ -198,7 +200,8 @@ function checkExport() {
 }
 
 function showExcelExport() {
-	json_url = $('form').find('.js-export-json').attr('href');
+	var json_url = $('form').find('.js-export-json').attr('href');
+	$('form').find('.js-excel-download').remove();
 	$excel_btn.text('Generating...');
 
 	$.getJSON(json_url, function(data) {
@@ -221,12 +224,20 @@ function showExcelExport() {
 		});
 		s += '</table>';
 
-		var $link = $('<a class="button js-export-excel" download="Trello.xls" target="_blank">')
-		.text('.XLS')
-		.attr('href','data:application/ms-excel,'+encodeURIComponent(s))
-		.insertAfter($excel_btn);
+		var bb = new BlobBuilder();
+		bb.append(s);
 
-		$excel_btn.text('Excel');
+		var $link = $('<a download="Trello.xls" target="_blank">')
+			.text('.XLS')
+			.attr({
+				download: 'Trello.xls',
+				class: 'button js-export-excel js-real-link js-excel-download',
+				target: '_blank',
+				href: window.URL.createObjectURL(bb.getBlob('application/ms-excel'))
+			})
+			.insertAfter($excel_btn);
+
+		$excel_btn.remove().text('Excel')
 	});
 
 	return false;
