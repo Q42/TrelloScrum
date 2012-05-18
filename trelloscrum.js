@@ -227,18 +227,19 @@ function showExcelExport() {
 		var bb = new BlobBuilder();
 		bb.append(s);
 
-		var $link = $('<a download="Trello.xls" target="_blank">')
-			.text('.XLS')
-			.attr({
-				download: 'Trello.xls',
-				class: 'button js-export-excel js-real-link js-excel-download',
-				target: '_blank',
-				href: window.URL.createObjectURL(bb.getBlob('application/ms-excel'))
-			})
-			.insertAfter($excel_btn);
-
-		$excel_btn.remove().text('Excel')
+		$excel_btn
+			.text('Excel')
+			.replaceWith(
+				$('<a>')
+					.text('.XLS')
+					.attr({
+						download: 'Trello.xls',
+						class: 'button js-export-excel js-real-link js-excel-download',
+						target: '_blank',
+						href: window.URL.createObjectURL(bb.getBlob('application/ms-excel'))
+					})
+			)
 	});
 
-	return false;
+	return false
 };
