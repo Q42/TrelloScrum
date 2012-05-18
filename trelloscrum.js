@@ -231,18 +231,19 @@ function showExcelExport() {
 		board_title_parsed = document.location.href.match(board_title_reg);
 		board_title = board_title_parsed[1];
 
-		var $link = $('<a download="' + board_title + '.xls" target="_blank">')
-			.text('Download')
-			.attr({
-				download: board_title + '.xls',
-				class: 'button js-export-excel js-real-link js-excel-download',
-				target: '_blank',
-				href: window.URL.createObjectURL(bb.getBlob('application/ms-excel'))
-			})
-			.insertAfter($excel_btn);
-
-		$excel_btn.remove().text('Excel')
+		$excel_btn
+			.text('Excel')
+			.replaceWith(
+				$('<a>')
+					.text('Download')
+					.attr({
+						download: board_title + '.xls',
+						class: 'button js-export-excel js-real-link js-excel-download',
+						target: '_blank',
+						href: window.URL.createObjectURL(bb.getBlob('application/ms-excel'))
+					})
+			)
 	});
 
-	return false;
+	return false
 };
