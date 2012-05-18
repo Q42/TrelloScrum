@@ -1,5 +1,5 @@
 /*
-** TrelloScrum v0.54 - https://github.com/Q42/TrelloScrum
+** TrelloScrum v0.56 - https://github.com/Q42/TrelloScrum
 ** Adds Scrum to your Trello
 **
 ** Original:
@@ -26,80 +26,124 @@ var filtered = false, //watch for filtered cards
 //what to do when DOM loads
 $(function(){
 	//watch filtering
-	$('.js-filter-cards').live('DOMSubtreeModified',function(){
-		filtered=$('.js-filter-cards').hasClass('is-on');
-		calcPoints()
+	$('.js-filter-toggle').live('mouseup',function(e){
+		setTimeout(function(){
+			filtered=$('.js-filter-cards').hasClass('is-on');
+			calcPoints()
+		})
 	});
 
 	//for storypoint picker
 	$(".card-detail-title .edit-controls").live('DOMNodeInserted',showPointPicker);
 	
+	function readList($c){
+		$c.each(function(){
+			if(!this.list) new List(this);
+			else if(this.list.calc) this.list.calc();
+		})
+	};
+
+	readList($('.list'));
+
+	$('body').bind('DOMSubtreeModified',function(e){
+		if($(e.target).hasClass('list'))
+			readList($(e.target))
+	});
 
 	//want: trello events
 	(function periodical(){
-		$('.list').each(list);
-		$('.list-card').each(listCard);
 		checkExport();
 		setTimeout(periodical,2000)
 	})()
 });
 
 //.list pseudo
-function list(e){
-	if(this.list)return;
-	this.list=true;
+function List(el){
+	if(el.list)return;
+	el.list=this;
 
-	var $list=$(this);
+	var $list=$(el),
+		busy = false,
+		to,
+		to2;
+
 	var $total=$('<span class="list-total">')
+		.bind('DOMNodeRemovedFromDocument',function(){
+			clearTimeout(to);
+			to=setTimeout(function(){
+				$total.appendTo($list.find('.list-header h2'))
+			})
+		})
 		.appendTo($list.find('.list-header h2'));
 
-	$total.bind('DOMNodeRemovedFromDocument',function(){
-		setTimeout(function(){
-			$total.appendTo($list.find('.list-header h2'))
-		})
+	$list.bind('DOMNodeInserted',function(e){
+		if($(e.target).hasClass('list-card') && !e.target.listCard) {
+			clearTimeout(to2);
+			to2=setTimeout(readCard,0,$(e.target))
+		}
 	});
+
+	function readCard($c){
+		$c.each(function(){
+			if($(this).hasClass('placeholder')) return;
+			if(!this.listCard) new ListCard(this)
+		})
+	};
 
 	this.calc = function(){
 		var score=0;
-		$list.find('.list-card').each(function(){if(!isNaN(Number(this.points)))score+=Number(this.points)});
+		$list.find('.list-card').each(function(){if(this.listCard && !isNaN(Number(this.listCard.points)))score+=Number(this.listCard.points)});
 		var scoreTruncated = Math.floor(score * 100) / 100;
 		$total.text(scoreTruncated>0?scoreTruncated:'')
-	}
+	};
+
+	readCard($list.find('.list-card'))
 };
 
 //.list-card pseudo
-function listCard(e){
-	if(this.listCard)return;
-	this.listCard=true;
+function ListCard(el){
+	if(el.listCard)return;
+	el.listCard=this;
 
 	var points=-1,
 		parsed,
 		that=this,
-		$card=$(this),
 		busy=false,
-		$badge=$('<div class="badge badge-points point-count" style="background-image: url('+iconUrl+')"/>');
-
-	if($card.hasClass('placeholder'))return;
-
-	$card.bind('DOMNodeInserted',function(e){
-		if(!busy&&$(e.target).hasClass('list-card-title'))setTimeout(getPoints)
-	});
+		busy2=false,
+		to,
+		to2,
+		ptitle,
+		$card=$(el)
+			.bind('DOMNodeInserted',function(e){
+				if(!busy && ($(e.target).hasClass('list-card-title') || e.target==$card[0])) {
+					clearTimeout(to2);
+					to2=setTimeout(getPoints);
+				}
+			}),
+		$badge=$('<div class="badge badge-points point-count" style="background-image: url('+iconUrl+')"/>')
+			.bind('DOMSubtreeModified DOMNodeRemovedFromDocument',function(e){
+				if(busy2)return;
+				busy2=true;
+				clearTimeout(to);
+				to = setTimeout(function(){
+					$badge.prependTo($card.find('.badges'));
+					busy2=false;
+				});
+			});
 
 	function getPoints(){
 		var $title=$card.find('a.list-card-title');
-		if(!$title[0])return;
+		if(!$title[0]||busy)return;
 		busy=true;
-		var title=$title.html();
-		parsed=($title[0].otitle||title).match(reg);
-		points=parsed?parsed[1]:title;
-		if(points!=title)$title[0].otitle=title;
-		$title.html($title.html().replace(reg,''));
+		var title=$title[0].text;
+		parsed=title.match(reg);
+		points=parsed?parsed[1]:-1;
 		if($card.parent()[0]){
-			$badge.text(that.points).prependTo($card.find('.badges'));
+			$title[0].textContent = title.replace(reg,'');
+			$badge.text(that.points);
 			$badge.attr({title: 'This card has '+that.points+' storypoint' + (that.points == 1 ? '.' : 's.')})
 		}
 		busy=false;
-		calcPoints($card.closest('.list'))
 	};
 
 	this.__defineGetter__('points',function(){
@@ -112,7 +156,7 @@ function listCard(e){
 
 //forcibly calculate list totals
 function calcPoints($el){
-	($el||$('.list')).each(function(){if(this.calc)this.calc()})
+	($el||$('.list')).each(function(){if(this.list)this.list.calc()})
 };
 
 //the story point picker
