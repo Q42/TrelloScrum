@@ -178,7 +178,7 @@ function showPointPicker() {
 };
 
 //for export
-var $excel_btn;
+var $excel_btn,$excel_dl;
 window.URL = window.webkitURL || window.URL;
 window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
 
@@ -200,11 +200,9 @@ function checkExport() {
 }
 
 function showExcelExport() {
-	var json_url = $('form').find('.js-export-json').attr('href');
-	$('form').find('.js-excel-download').remove();
 	$excel_btn.text('Generating...');
 
-	$.getJSON(json_url, function(data) {
+	$.getJSON($('form').find('.js-export-json').attr('href'), function(data) {
 		var s = '<table id="export" border=1>';
 		s += '<tr><th>Points</th><th>Story</th><th>Description</th></tr>';
 		$.each(data['lists'], function(key, list) {
@@ -233,16 +231,19 @@ function showExcelExport() {
 
 		$excel_btn
 			.text('Excel')
-			.replaceWith(
-				$('<a>')
-					.text('Download')
+			.after(
+				$excel_dl=$('<a>')
 					.attr({
 						download: board_title + '.xls',
-						class: 'button js-export-excel js-real-link js-excel-download',
-						target: '_blank',
 						href: window.URL.createObjectURL(bb.getBlob('application/ms-excel'))
 					})
-			)
+			);
+
+		var evt = document.createEvent('MouseEvents');
+		evt.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+		$excel_dl[0].dispatchEvent(evt);
+		$excel_dl.remove()
+
 	});
 
 	return false
