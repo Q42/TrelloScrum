@@ -226,11 +226,15 @@ function showExcelExport() {
 
 		var bb = new BlobBuilder();
 		bb.append(s);
+		
+		board_title_reg = /.*\/board\/(.*)\//;
+		board_title_parsed = document.location.href.match(board_title_reg);
+		board_title = board_title_parsed[1];
 
-		var $link = $('<a download="Trello.xls" target="_blank">')
-			.text('.XLS')
+		var $link = $('<a download="' + board_title + '.xls" target="_blank">')
+			.text('Download')
 			.attr({
-				download: 'Trello.xls',
+				download: board_title + '.xls',
 				class: 'button js-export-excel js-real-link js-excel-download',
 				target: '_blank',
 				href: window.URL.createObjectURL(bb.getBlob('application/ms-excel'))
