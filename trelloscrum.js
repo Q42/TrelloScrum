@@ -17,10 +17,13 @@
 
 //default story point picker sequence
 var _pointSeq = ['?', 0, 1, 2, 3, 5, 8, 13, 20];
+//attributes representing points values for card (reverse display order)
+var _pointsAttr = ['cpoints', 'points'];
+
 
 //internals
 var filtered = false, //watch for filtered cards
-	reg = /\((\x3f|\d*\.?\d+)\)\s?/m, //parse regexp- accepts digits, decimals and '?'
+	reg = /[\[\(](\x3f|\d*\.?\d+)([\)\]])\s?/m, //parse regexp- accepts digits, decimals and '?', surrounded by () or []
 	iconUrl = chrome.extension.getURL('images/storypoints-icon.png');
 
 //what to do when DOM loads
@@ -90,10 +93,14 @@ function List(el){
 	};
 
 	this.calc = function(){
-		var score=0;
-		$list.find('.list-card').each(function(){if(this.listCard && !isNaN(Number(this.listCard.points)))score+=Number(this.listCard.points)});
-		var scoreTruncated = Math.floor(score * 100) / 100;
-		$total.text(scoreTruncated>0?scoreTruncated:'')
+		$total.empty();
+		for (var i in _pointsAttr){
+			var score=0;
+			var attr = _pointsAttr[i];
+			$list.find('.list-card').each(function(){if(this.listCard && !isNaN(Number(this.listCard[attr])))score+=Number(this.listCard[attr])});
+			var scoreTruncated = Math.floor(score * 100) / 100;			
+			$total.append('<span class="'+attr+'">'+(scoreTruncated>0?scoreTruncated:'')+'</span>');
+		}
 	};
 
 	readCard($list.find('.list-card'))
@@ -105,6 +112,7 @@ function ListCard(el){
 	el.listCard=this;
 
 	var points=-1,
+		consumed=false,
 		parsed,
 		that=this,
 		busy=false,
@@ -136,18 +144,32 @@ function ListCard(el){
 		busy=true;
 		var title=$title[0].text;
 		parsed=title.match(reg);
-		points=parsed?parsed[1]:-1;
+		points="";
+		consumed=false;
+		if (parsed){
+			points = parsed[1];
+			consumed = parsed[2]=="]"?true:false;	
+		}
 		if($card.parent()[0]){
 			$title[0].textContent = title.replace(reg,'');
-			$badge.text(that.points);
-			$badge.attr({title: 'This card has '+that.points+' storypoint' + (that.points == 1 ? '.' : 's.')})
+			$badge.text(points);
+			consumed ? $badge.addClass("consumed") : $badge.removeClass("consumed");
+			$badge.attr({title: 'This card has '+points+' storypoint' + (points == 1 ? '.' : 's.')})
 		}
 		busy=false;
 	};
 
-	this.__defineGetter__('points',function(){
+	function commonDisplayCheck(){
 		//don't add to total when filtered out
-		return parsed&&(!filtered||($card.css('opacity')==1 && $card.css('display')!='none'))?points:''
+		return parsed&&(!filtered||($card.css('opacity')==1 && $card.css('display')!='none'));
+	}
+
+	this.__defineGetter__('points',function(){
+		return commonDisplayCheck()&&!consumed?points:''
+	});
+
+	this.__defineGetter__('cpoints',function(){
+		return commonDisplayCheck()&&consumed?points:''
 	});
 
 	getPoints()

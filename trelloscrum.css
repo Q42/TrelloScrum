@@ -6,6 +6,11 @@
 	margin: 1px 0px 0 0;
 }
 
+.list-total .cpoints{
+	margin-right:3px;
+	opacity: 0.5;
+}
+
 .list .list-title h2 {
 	float: none !important;
 	display: inline !important;
@@ -49,4 +54,8 @@
 
 .badge-points:empty {
 	display: none;
+}
+
+.badge-points.consumed{
+	opacity: 0.5;
 }
