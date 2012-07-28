@@ -17,13 +17,14 @@
 
 //default story point picker sequence
 var _pointSeq = ['?', 0, 1, 2, 3, 5, 8, 13, 20];
-//attributes representing points values for card (reverse display order)
+//attributes representing points values for card
 var _pointsAttr = ['cpoints', 'points'];
 
 
 //internals
 var filtered = false, //watch for filtered cards
-	reg = /[\[\(](\x3f|\d*\.?\d+)([\)\]])\s?/m, //parse regexp- accepts digits, decimals and '?', surrounded by () or []
+	reg = /[\(](\x3f|\d*\.?\d+)([\)])\s?/m, //parse regexp- accepts digits, decimals and '?', surrounded by ()
+	regC = /[\[](\x3f|\d*\.?\d+)([\]])\s?/m, //parse regexp- accepts digits, decimals and '?', surrounded by []
 	iconUrl = chrome.extension.getURL('images/storypoints-icon.png');
 
 //what to do when DOM loads
@@ -87,8 +88,27 @@ function List(el){
 
 	function readCard($c){
 		$c.each(function(){
-			if($(this).hasClass('placeholder')) return;
-			if(!this.listCard) new ListCard(this)
+			var that=this,
+					 to2,
+					 busy=false;
+			if($(that).hasClass('placeholder')) return;
+			if(!that.listCard){
+				for (var i in _pointsAttr){
+					new ListCard(that, _pointsAttr[i])
+				}
+				$(that).bind('DOMNodeInserted',function(e){
+					if(!busy && ($(e.target).hasClass('list-card-title') || e.target==that)) {
+						clearTimeout(to2);
+						to2=setTimeout(function(){
+							busy=true;
+							for (var i in that.listCard){
+								that.listCard[i].refresh();
+							}
+							busy=false;
+						});
+					}
+				});
+			} 
 		})
 	};
 
@@ -97,82 +117,65 @@ function List(el){
 		for (var i in _pointsAttr){
 			var score=0;
 			var attr = _pointsAttr[i];
-			$list.find('.list-card').each(function(){if(this.listCard && !isNaN(Number(this.listCard[attr])))score+=Number(this.listCard[attr])});
+			$list.find('.list-card').each(function(){if(this.listCard && !isNaN(Number(this.listCard[attr].points)))score+=Number(this.listCard[attr].points)});
 			var scoreTruncated = Math.floor(score * 100) / 100;			
 			$total.append('<span class="'+attr+'">'+(scoreTruncated>0?scoreTruncated:'')+'</span>');
 		}
 	};
 
-	readCard($list.find('.list-card'))
+	readCard($list.find('.list-card'));
+	this.calc();
 };
 
 //.list-card pseudo
-function ListCard(el){
-	if(el.listCard)return;
-	el.listCard=this;
+function ListCard(el, identifier){
+	if(el.listCard && el.listCard[identifier]) return;
+	//lazily create object
+	if (!el.listCard){
+		el.listCard={};
+	}
+	el.listCard[identifier]=this;
 
 	var points=-1,
-		consumed=false,
+		consumed=identifier!=='points',
+		regexp=consumed?reg:regC,
 		parsed,
 		that=this,
 		busy=false,
-		busy2=false,
 		to,
-		to2,
 		ptitle,
-		$card=$(el)
-			.bind('DOMNodeInserted',function(e){
-				if(!busy && ($(e.target).hasClass('list-card-title') || e.target==$card[0])) {
-					clearTimeout(to2);
-					to2=setTimeout(getPoints);
-				}
-			}),
+		$card=$(el),
 		$badge=$('<div class="badge badge-points point-count" style="background-image: url('+iconUrl+')"/>')
 			.bind('DOMSubtreeModified DOMNodeRemovedFromDocument',function(e){
-				if(busy2)return;
-				busy2=true;
+				if(busy)return;
+				busy=true;
 				clearTimeout(to);
 				to = setTimeout(function(){
 					$badge.prependTo($card.find('.badges'));
-					busy2=false;
+					busy=false;
 				});
 			});
 
-	function getPoints(){
+	this.refresh=function(){
 		var $title=$card.find('a.list-card-title');
-		if(!$title[0]||busy)return;
-		busy=true;
+		if(!$title[0])return;
 		var title=$title[0].text;
-		parsed=title.match(reg);
-		points="";
-		consumed=false;
-		if (parsed){
-			points = parsed[1];
-			consumed = parsed[2]=="]"?true:false;	
-		}
+		parsed=title.match(regexp);
+		points=parsed?parsed[1]:-1;
 		if($card.parent()[0]){
-			$title[0].textContent = title.replace(reg,'');
-			$badge.text(points);
-			consumed ? $badge.addClass("consumed") : $badge.removeClass("consumed");
-			$badge.attr({title: 'This card has '+points+' storypoint' + (points == 1 ? '.' : 's.')})
+			$title[0].textContent = title.replace(regexp,'');
+			$badge.text(that.points);
+			consumed?$badge.addClass("consumed"):$badge.removeClass('consumed');
+			$badge.attr({title: 'This card has '+that.points+ (consumed?' consumed':'')+' storypoint' + (that.points == 1 ? '.' : 's.')})
 		}
-		busy=false;
 	};
 
-	function commonDisplayCheck(){
-		//don't add to total when filtered out
-		return parsed&&(!filtered||($card.css('opacity')==1 && $card.css('display')!='none'));
-	}
-
 	this.__defineGetter__('points',function(){
-		return commonDisplayCheck()&&!consumed?points:''
+		//don't add to total when filtered out
+		return parsed&&(!filtered||($card.css('opacity')==1 && $card.css('display')!='none'))?points:''
 	});
 
-	this.__defineGetter__('cpoints',function(){
-		return commonDisplayCheck()&&consumed?points:''
-	});
-
-	getPoints()
+	this.refresh();
 };
 
 //forcibly calculate list totals
