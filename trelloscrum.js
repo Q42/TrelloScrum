@@ -138,7 +138,7 @@ function ListCard(el, identifier){
 
 	var points=-1,
 		consumed=identifier!=='points',
-		regexp=consumed?reg:regC,
+		regexp=consumed?regC:reg,
 		parsed,
 		that=this,
 		busy=false,
