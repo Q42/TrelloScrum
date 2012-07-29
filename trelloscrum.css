@@ -41,6 +41,15 @@
 	padding-top: 5px;
 }
 
+.points-done-icon{
+	background-position: 0px 3px !important;
+	background-repeat: no-repeat !important;
+	margin-left:3px;
+}
+.js-points-done:hover > .points-done-icon{
+	background-position: -11px 3px !important;
+}
+
 .point-value {
 	background-color: #006580 !important;
 	border-radius: 3px;

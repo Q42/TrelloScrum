@@ -25,7 +25,8 @@ var _pointsAttr = ['cpoints', 'points'];
 var filtered = false, //watch for filtered cards
 	reg = /[\(](\x3f|\d*\.?\d+)([\)])\s?/m, //parse regexp- accepts digits, decimals and '?', surrounded by ()
 	regC = /[\[](\x3f|\d*\.?\d+)([\]])\s?/m, //parse regexp- accepts digits, decimals and '?', surrounded by []
-	iconUrl = chrome.extension.getURL('images/storypoints-icon.png');
+	iconUrl = chrome.extension.getURL('images/storypoints-icon.png'),
+	pointsDoneUrl = chrome.extension.getURL('images/points-done.png');
 
 //what to do when DOM loads
 $(function(){
@@ -218,7 +219,7 @@ function showDoneButton(){
 	checkIfDone();
 	if ($(this).find('.js-points-done-sidebar-button').length) return;
 	var $btn = $('<div class="js-points-done-sidebar-button">'+
-					'<a class="button-link js-points-done"><span class="app-icon small-icon follow-icon"></span> Done '+
+					'<a class="button-link js-points-done"><span class="app-icon small-icon points-done-icon" style="background-image: url('+pointsDoneUrl+')"></span> Done '+
 						'<span class="on">'+
 							'<span class="app-icon small-icon light check-icon"></span>'+
 						 '</span> '+
