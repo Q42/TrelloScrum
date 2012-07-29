@@ -21,7 +21,7 @@ var _pointSeq = ['?', 0, 1, 2, 3, 5, 8, 13, 20];
 //internals
 var filtered = false, //watch for filtered cards
 	reg = /\((\x3f|\d*\.?\d+)\)\s?/m, //parse regexp- accepts digits, decimals and '?'
-	iconUrl = chrome.extension.getURL('images/storypoints-icon.png');
+	iconUrl = $.browser.safari == true?(safari.extension.baseURI + 'images/storypoints-icon.png'):(chrome.extension.getURL('images/storypoints-icon.png'));
 
 //what to do when DOM loads
 $(function(){
