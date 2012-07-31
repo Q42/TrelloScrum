@@ -44,13 +44,38 @@ $(function(){
 	$(document).on('DOMNodeInserted','.window', showDoneButton);
 
 	$('body').bind('DOMSubtreeModified',function(e){
-		if($(e.target).hasClass('list'))
-			readList($(e.target))
+		if($(e.target).hasClass('list')){
+			readList($(e.target));
+			computeTotal();
+		}
 	});
 
 	$('.js-share').live('mouseup',function(){
 		setTimeout(checkExport)
 	});
+
+	function computeTotal(){
+		var $title = $(".board-title");
+		var $total = $(".board-title .list-total");
+		if ($total.length == 0){
+			$total = $("<span class='list-total'>").appendTo($title);
+		}
+		for (var i in _pointsAttr){
+			var score = 0;
+			var attr = _pointsAttr[i];
+			$("#board .list-total ."+attr).each(function(){ 
+				var value = $(this).text();
+				if (value && !isNaN(value)){
+					score+=parseFloat(value);
+				} 
+			});
+			var $countElem = $('.board-title .list-total .'+attr);
+			if ($countElem.length > 0){
+				$countElem.remove();
+			}
+			$total.append("<span class='"+attr+"'>"+score+"</span>");
+		}
+	}
 
 	function readList($c){
 		$c.each(function(){
