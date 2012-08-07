@@ -35,6 +35,7 @@ $(function(){
 
 	//for storypoint picker
 	$(".card-detail-title .edit-controls").live('DOMNodeInserted',showPointPicker);
+	$(".check-item .check_item_text .edit .edit-controls").live('DOMNodeInserted',showChecklistItemPointPicker);
 	
 	$('body').bind('DOMSubtreeModified',function(e){
 		if($(e.target).hasClass('list'))
@@ -176,6 +177,78 @@ function showPointPicker() {
 		return false
 	}))
 };
+
+//the checklist item story point picker
+function showChecklistItemPointPicker() {
+	if($(this).find('.picker').length) return;
+	var $picker = $('<div class="picker">').appendTo('.check-item .check_item_text .edit .edit-controls');
+	for (var i in _pointSeq) $picker.append($('<span class="point-value">').text(_pointSeq[i]).click(function(){
+		var value = $(this).text();
+		var $text = $('.checklist .task-list .check-item .editing .edit input');
+		var text = $text.val();
+
+		// replace checklist item text
+		$text[0].value=updateTextWithPoints(text, value);
+		
+		// click checklist item button to save the value in the text
+		$(".check_item_text .edit .js-save-edit").click();
+		
+		updateCardTitle();
+
+		return false
+	}))
+};
+
+function updateCardTitle()
+{
+	// timeout to allow enough time for checklist item title to update
+	setTimeout(function() {
+		var $currentTitle = $('.window-title .window-title-text');
+		var titleText = $currentTitle.text(); 
+		var $title = $('.card-detail-title .edit textarea');
+		$(".card-detail-title").addClass("editing");
+		var total = calculateCheckListPoints();
+		$title[0].value =updateTextWithPoints(titleText, total);
+	
+		// add edit button to card title edit controls
+		$('<div class="edit-controls clearfix">').appendTo('.card-detail-title .edit');
+		$('<input type="submit" class="primary confirm js-save-edit" value="Save">').appendTo('.card-detail-title .edit-controls');
+		
+		// then click our button so it all gets saved away
+		$(".card-detail-title .edit .js-save-edit").click();
+	
+	}, 500);
+	
+	return true;
+}
+
+function updateTextWithPoints(text, value)
+{
+	return text.match(reg)?text.replace(reg, '('+value+') '):'('+value+') ' + text;
+}
+
+function calculateCheckListPoints()
+{
+	var $checkListItem = $('.task-list .check-item .check_item_text .current');
+	var total = 0;
+	for (var i in _pointSeq)
+	{
+		console.log("text = " + $checkListItem.eq(i).text());
+		var parsed=$checkListItem.eq(i).text().match(reg);
+		console.log("parsed = " + parsed);
+		var points=parsed?parsed[1]:0;
+		console.log("points = " + points);
+		total += Number(points);
+		console.log("total = " + total);
+	}
+	
+	return total;
+	
+	
+	
+	
+	
+}
 
 //for export
 var $excel_btn,$excel_dl;
