@@ -28,6 +28,15 @@ var filtered = false, //watch for filtered cards
 	iconUrl = chrome.extension.getURL('images/storypoints-icon.png'),
 	pointsDoneUrl = chrome.extension.getURL('images/points-done.png');
 
+var Utils = (function(){
+	function _roundValue(_val){
+		return (Math.floor(_val * 100) / 100);
+	}
+	return {
+		roundValue : _roundValue
+	}
+})();
+
 //what to do when DOM loads
 $(function(){
 	//watch filtering
@@ -53,7 +62,7 @@ $(function(){
 	$('.js-share').live('mouseup',function(){
 		setTimeout(checkExport)
 	});
-
+	
 	function computeTotal(){
 		var $title = $(".board-title");
 		var $total = $(".board-title .list-total");
@@ -73,7 +82,7 @@ $(function(){
 			if ($countElem.length > 0){
 				$countElem.remove();
 			}
-			$total.append("<span class='"+attr+"'>"+score+"</span>");
+			$total.append("<span class='"+attr+"'>"+Utils.roundValue(score)+"</span>");
 		}
 	}
 
@@ -146,7 +155,7 @@ function List(el){
 			var score=0;
 			var attr = _pointsAttr[i];
 			$list.find('.list-card').each(function(){if(this.listCard && !isNaN(Number(this.listCard[attr].points)))score+=Number(this.listCard[attr].points)});
-			var scoreTruncated = Math.floor(score * 100) / 100;			
+			var scoreTruncated = Utils.roundValue(score);			
 			$total.append('<span class="'+attr+'">'+(scoreTruncated>0?scoreTruncated:'')+'</span>');
 		}
 	};
