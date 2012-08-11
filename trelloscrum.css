@@ -6,6 +6,11 @@
 	margin: 1px 0px 0 0;
 }
 
+.list-total .cpoints{
+	margin-right:3px;
+	opacity: 0.5;
+}
+
 .list .list-title h2 {
 	float: none !important;
 	display: inline !important;
@@ -36,6 +41,15 @@
 	padding-top: 5px;
 }
 
+.points-done-icon{
+	background-position: 0px 3px !important;
+	background-repeat: no-repeat !important;
+	margin-left:3px;
+}
+.js-points-done:hover > .points-done-icon{
+	background-position: -11px 3px !important;
+}
+
 .point-value {
 	background-color: #006580 !important;
 	border-radius: 3px;
@@ -49,4 +63,8 @@
 
 .badge-points:empty {
 	display: none;
+}
+
+.badge-points.consumed{
+	opacity: 0.5;
 }
