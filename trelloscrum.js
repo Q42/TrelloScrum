@@ -1,5 +1,5 @@
 /*
-** TrelloScrum v0.56 - https://github.com/Q42/TrelloScrum
+** TrelloScrum v1.1 - https://github.com/Q42/TrelloScrum
 ** Adds Scrum to your Trello
 **
 ** Original:
@@ -12,6 +12,7 @@
 ** Bastiaan Terhorst <https://github.com/bastiaanterhorst>
 ** Morgan Craft <https://github.com/mgan59>
 ** Frank Geerlings <https://github.com/frankgeerlings>
+** Cedric Gatay <https://github.com/CedricGatay>
 **
 */
 
