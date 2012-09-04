@@ -49,8 +49,6 @@ $(function(){
 
 	//for storypoint picker
 	$(".card-detail-title .edit-controls").live('DOMNodeInserted',showPointPicker);
-	//for done button
-	$(document).on('DOMNodeInserted','.window', showDoneButton);
 
 	$('body').bind('DOMSubtreeModified',function(e){
 		if($(e.target).hasClass('list')){
@@ -239,54 +237,6 @@ function showPointPicker() {
 	}))
 };
 
-function showDoneButton(){
-	function checkIfDone(){
-		var text = $('.card-detail-title.editable .window-title-text').text();
-		var match = text.match(regC);
-		if (match){
-			$(".js-points-done").addClass('is-on');
-		}else{
-			$(".js-points-done").removeClass('is-on');
-		}
-	};
-	//allows to refresh check state on DOMNodeInserted event
-	checkIfDone();
-	if ($(this).find('.js-points-done-sidebar-button').length) return;
-	var $btn = $('<div class="js-points-done-sidebar-button">'+
-					'<a class="button-link js-points-done"><span class="app-icon small-icon points-done-icon" style="background-image: url('+pointsDoneUrl+')"></span> Done '+
-						'<span class="on">'+
-							'<span class="app-icon small-icon light check-icon"></span>'+
-						 '</span> '+
-					'</a> '+
-				  '</div>').prependTo('.window-module.other-actions.clearfix div.clearfix');
-	
-	$btn.on('click', function(){
-		//we toggle the card in edit mode, hacky but required to update values (tends to flashes)
-		var $header = $('.card-detail-title.editable .window-title-text').click();
-		var $text = $('.card-detail-title .edit textarea');
-		var text = $text.val();
-
-		var $jsbtn = $(".js-points-done");
-		var match;
-		if ($jsbtn.hasClass('is-on')){
-			match = text.match(regC);
-			if (match){
-				$text.val(text.replace(regC, '('+match[1]+') '));
-				$jsbtn.removeClass('is-on');
-			}	
-		}else{
-			match = text.match(reg);
-			if (match){
-				$text.val(text.replace(reg, '['+match[1]+'] '));
-				$jsbtn.addClass('is-on');
-			}
-		}	
-
-		// then click our button so it all gets saved away
-		$(".card-detail-title .edit .js-save-edit").click();
-		return false;
-	});
-}
 
 //for export
 var $excel_btn,$excel_dl;
