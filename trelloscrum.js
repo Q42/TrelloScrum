@@ -41,23 +41,19 @@ var pointSeq = ['?', 0, 1, 2, 3, 5, 8, 13, 20], // default story point picker se
 window.URL = window.webkitURL || window.URL;
 window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
 
-$(function () {
+// .list-card pseudo
+function ListCard(el, identifier) {
     'use strict';
+    if (el.listCard && el.listCard[identifier]) {
+        return;
+    }
+    // lazily create object
+    if (!el.listCard) {
+        el.listCard = {};
+    }
+    el.listCard[identifier] = this;
 
-    // private functions
-
-    // .list-card pseudo
-    function ListCard(el, identifier) {
-        if (el.listCard && el.listCard[identifier]) {
-            return;
-        }
-        // lazily create object
-        if (!el.listCard) {
-            el.listCard = {};
-        }
-        el.listCard[identifier] = this;
-
-        var points = -1,
+    var points = -1,
 		consumed = identifier !== 'points',
 		regexp = consumed ? regC : reg,
 		parsed,
@@ -66,7 +62,7 @@ $(function () {
 		to,
 		$card = $(el),
 		$badge = $('<div class="badge badge-points point-count" style="background-image: url(' + iconUrl + ')"/>')
-			.bind('DOMSubtreeModified DOMNodeRemovedFromDocument', function (e) {
+			.on('DOMSubtreeModified DOMNodeRemovedFromDocument', function (e) {
 			    if (busy) {
 			        return;
 			    }
@@ -78,50 +74,51 @@ $(function () {
 			    });
 			});
 
-        this.refresh = function () {
-            var $title = $card.find('a.list-card-title'), title;
-            if (!$title[0]) {
-                return;
-            }
-            title = $title[0].text;
-            parsed = title.match(regexp);
-            points = parsed ? parsed[1] : -1;
-            if ($card.parent()[0]) {
-                $title[0].textContent = title.replace(regexp, '');
-                $badge.text(that.points);
-
-                if (consumed) {
-                    $badge.addClass("consumed");
-                }
-                else {
-                    $badge.removeClass('consumed');
-                }
-
-                $badge.attr({ title: 'This card has ' + that.points + (consumed ? ' consumed' : '') + ' storypoint' + (that.points === 1 ? '.' : 's.') });
-            }
-        };
-
-        this.__defineGetter__('points', function () {
-            // don't add to total when filtered out
-            return parsed && (!filtered || ($card.css('opacity') === 1 && $card.css('display') !== 'none')) ? points : '';
-        });
-
-        this.refresh();
-    }
-
-    // .list pseudo
-    function List(el) {
-        if (el.list) {
+    this.refresh = function () {
+        var $title = $card.find('a.list-card-title'), title;
+        if (!$title[0]) {
             return;
         }
+        title = $title[0].text;
+        parsed = title.match(regexp);
+        points = parsed ? parsed[1] : -1;
+        if ($card.parent()[0]) {
+            $title[0].textContent = title.replace(regexp, '');
+            $badge.text(that.points);
 
-        el.list = this;
+            if (consumed) {
+                $badge.addClass("consumed");
+            }
+            else {
+                $badge.removeClass('consumed');
+            }
 
-        var $list = $(el),
+            $badge.attr({ title: 'This card has ' + that.points + (consumed ? ' consumed' : '') + ' storypoint' + (that.points === 1 ? '.' : 's.') });
+        }
+    };
+
+    this.__defineGetter__('points', function () {
+        // don't add to total when filtered out
+        return parsed && (!filtered || ($card.css('opacity') === 1 && $card.css('display') !== 'none')) ? points : '';
+    });
+
+    this.refresh();
+}
+
+// .list pseudo
+function List(el) {
+    'use strict';
+    if (el.list) {
+        return;
+    }
+
+    el.list = this;
+
+    var $list = $(el),
                 to,
                 to2,
                 $total = $('<span class="list-total">')
-		.bind('DOMNodeRemovedFromDocument', function () {
+		.on('DOMNodeRemovedFromDocument', function () {
 		    clearTimeout(to);
 		    to = setTimeout(function () {
 		        $total.appendTo($list.find('.list-header h2'));
@@ -129,127 +126,131 @@ $(function () {
 		})
 		.appendTo($list.find('.list-header h2'));
 
-        function readCard($c) {
-            $c.each(function () {
-                var that = this,
+    function readCard($c) {
+        $c.each(function () {
+            var that = this,
                         to22,
                         busy = false,
                         i,
                         attr;
-                if ($(that).hasClass('placeholder')) {
-                    return;
-                }
-                if (!that.listCard) {
-                    that.listCard = [];
-                    for (i in pointsAttr) {
-                        if (pointsAttr.hasOwnProperty(i)) {
-                            attr = pointsAttr[i];
+            if ($(that).hasClass('placeholder')) {
+                return;
+            }
+            if (!that.listCard) {
+                that.listCard = [];
+                for (i in pointsAttr) {
+                    if (pointsAttr.hasOwnProperty(i)) {
+                        attr = pointsAttr[i];
 
-                            that.listCard.push(new ListCard(that, attr));
-                        }
+                        that.listCard.push(new ListCard(that, attr));
                     }
+                }
 
-                    $(that).bind('DOMNodeInserted', function (e) {
-                        if (!busy && ($(e.target).hasClass('list-card-title') || e.target === that)) {
-                            clearTimeout(to22);
-                            to22 = setTimeout(function () {
-                                var c, card;
-                                busy = true;
+                $(that).on('DOMNodeInserted', function (e) {
+                    if (!busy && ($(e.target).hasClass('list-card-title') || e.target === that)) {
+                        clearTimeout(to22);
+                        to22 = setTimeout(function () {
+                            var c, card;
+                            busy = true;
 
-                                for (c in that.listCard) {
-                                    if (that.listCard.hasOwnProperty(c)) {
-                                        card = that.listCard[c];
+                            for (c in that.listCard) {
+                                if (that.listCard.hasOwnProperty(c)) {
+                                    card = that.listCard[c];
 
-                                        card.refresh();
-                                    }
+                                    card.refresh();
                                 }
+                            }
 
-                                busy = false;
-                            });
-                        }
-                    });
+                            busy = false;
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    $list.on('DOMNodeInserted', function (e) {
+        if ($(e.target).hasClass('list-card') && !e.target.listCard) {
+            clearTimeout(to2);
+            to2 = setTimeout(readCard, 0, $(e.target));
+        }
+    });
+
+    this.calc = function () {
+        var i, score, attr, scoreTruncated;
+        $total.empty();
+
+        function findListCards(elements) {
+            elements.each(function () {
+                if (this.listCard && !isNaN(Number(this.listCard[attr].points))) {
+                    score += Number(this.listCard[attr].points);
                 }
             });
         }
 
-        $list.bind('DOMNodeInserted', function (e) {
-            if ($(e.target).hasClass('list-card') && !e.target.listCard) {
-                clearTimeout(to2);
-                to2 = setTimeout(readCard, 0, $(e.target));
+        for (i in pointsAttr) {
+            if (pointsAttr.hasOwnProperty(i)) {
+                attr = pointsAttr[i];
+                score = 0;
+                findListCards($list.find('.list-card'));
+                scoreTruncated = Utils.roundValue(score);
+                $total.append('<span class="' + attr + '">' + (scoreTruncated > 0 ? scoreTruncated : '') + '</span>');
             }
-        });
+        }
+    };
 
-        this.calc = function () {
-            var i, score, attr, scoreTruncated;
-            $total.empty();
+    readCard($list.find('.list-card'));
+    this.calc();
+}
 
-            function findListCards(elements) {
-                elements.each(function () {
-                    if (this.listCard && !isNaN(Number(this.listCard[attr].points))) {
-                        score += Number(this.listCard[attr].points);
-                    }
-                });
-            }
 
-            for (i in pointsAttr) {
-                if (pointsAttr.hasOwnProperty(i)) {
-                    attr = pointsAttr[i];
-                    score = 0;
-                    findListCards($list.find('.list-card'));
-                    scoreTruncated = Utils.roundValue(score);
-                    $total.append('<span class="' + attr + '">' + (scoreTruncated > 0 ? scoreTruncated : '') + '</span>');
-                }
-            }
-        };
 
-        readCard($list.find('.list-card'));
-        this.calc();
-    }
+// forcibly calculate list totals
+function calcPoints($el) {
+    'use strict';
+    ($el || $('.list')).each(function () {
+        if (this.list) {
+            this.list.calc();
+        }
+    });
+}
 
-    // forcibly calculate list totals
-    function calcPoints($el) {
-        ($el || $('.list')).each(function () {
-            if (this.list) {
-                this.list.calc();
-            }
-        });
-    }
+function showExcelExport() {
+    'use strict';
+    $excel_btn.text('Generating...');
 
-    function showExcelExport() {
-        $excel_btn.text('Generating...');
+    $.getJSON($('form').find('.js-export-json').attr('href'), function (data) {
+        var s, bb, boardTitleReg, boardTitleParsed, boardTitle, evt;
 
-        $.getJSON($('form').find('.js-export-json').attr('href'), function (data) {
-            var s, bb, boardTitleReg, boardTitleParsed, boardTitle, evt;
-
-            s = '<table id="export" border=1>'
+        s = '<table id="export" border=1>'
                 + '<tr><th>Points</th><th>Story</th><th>Description</th></tr>';
 
-            $.each(data.lists, function (key, list) {
-                var listId = list.id;
-                s += '<tr><th colspan="3">' + list.name + '</th></tr>';
+        $.each(data.lists, function (key, list) {
+            var listId = list.id;
+            s += '<tr><th colspan="3">' + list.name + '</th></tr>';
 
-                $.each(data.cards, function (key, card) {
-                    if (card.idList === listId) {
-                        var title = card.name,
+            $.each(data.cards, function (key, card) {
+                if (card.idList === listId) {
+                    var title = card.name,
                             parsed = title.match(reg),
                             points = parsed ? parsed[1] : '';
-                        title = title.replace(reg, '');
-                        s += '<tr><td>' + points + '</td><td>' + title + '</td><td>' + card.desc + '</td></tr>';
-                    }
-                });
-                s += '<tr><td colspan=3></td></tr>';
+                    title = title.replace(reg, '');
+                    s += '<tr><td>' + points + '</td><td>' + title + '</td><td>' + card.desc + '</td></tr>';
+                }
             });
-            s += '</table>';
+            s += '<tr><td colspan=3></td></tr>';
+        });
+        s += '</table>';
 
 
-            bb = new BlobBuilder();
-            bb.append(s);
+        bb = new BlobBuilder();
+        bb.append(s);
 
-            boardTitleReg = '/.*\/board\/(.*)\//';
-            boardTitleParsed = document.location.href.match(boardTitleReg);
-            boardTitle = boardTitleParsed[1];
+        boardTitleReg = '/.*\/board\/(.*)\//';
+        boardTitleParsed = document.location.href.match(boardTitleReg);
+        boardTitle = boardTitleParsed[1];
 
-            $excel_btn
+        $excel_btn
 			.text('Excel')
 			.after(
 				$excel_dl = $('<a>')
@@ -259,24 +260,25 @@ $(function () {
 					})
 			);
 
-            evt = document.createEvent('MouseEvents');
-            evt.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-            $excel_dl[0].dispatchEvent(evt);
-            $excel_dl.remove();
+        evt = document.createEvent('MouseEvents');
+        evt.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+        $excel_dl[0].dispatchEvent(evt);
+        $excel_dl.remove();
 
-        });
+    });
 
-        return false;
+    return false;
+}
+
+function checkExport() {
+    'use strict';
+    if ($('form').find('.js-export-excel').length) {
+        return;
     }
 
-    function checkExport() {
-        if ($('form').find('.js-export-excel').length) {
-            return;
-        }
-
-        var $jsBtn = $('form').find('.js-export-json');
-        if ($jsBtn.length) {
-            $excel_btn = $('<a>')
+    var $jsBtn = $('form').find('.js-export-json');
+    if ($jsBtn.length) {
+        $excel_btn = $('<a>')
 			.attr({
 			    style: 'margin: 0 4px 4px 0;',
 			    'class': 'button js-export-excel',
@@ -287,59 +289,62 @@ $(function () {
 			.text('Excel')
 			.click(showExcelExport)
 			.insertAfter($jsBtn);
-        }
-
     }
 
-    function computeTotal() {
-        var $title = $(".board-title"),
+}
+
+function computeTotal() {
+    'use strict';
+    var $title = $(".board-title"),
             $total = $(".board-title .list-total"),
             p,
             attr,
             score,
             $countElem;
 
-        if ($total.length === 0) {
-            $total = $("<span class='list-total'>").appendTo($title);
-        }
-
-        function findListTotals(elements) {
-            elements.each(function () {
-                var value = $(this).text();
-                if (value && !isNaN(value)) {
-                    score += parseFloat(value);
-                }
-            });
-        }
-
-        for (p in pointsAttr) {
-            if (pointsAttr.hasOwnProperty(p)) {
-                score = 0;
-                attr = pointsAttr[p];
-
-                findListTotals($("#board .list-total ." + attr));
-
-                $countElem = $('.board-title .list-total .' + attr);
-                if ($countElem.length > 0) {
-                    $countElem.remove();
-                }
-                $total.append("<span class='" + attr + "'>" + Utils.roundValue(score) + "</span>");
-            }
-        }
+    if ($total.length === 0) {
+        $total = $("<span class='list-total'>").appendTo($title);
     }
 
-    function readList($c) {
-        $c.each(function () {
-            if (!this.list) {
-                this.list = new List(this);
-            }
-            else if (this.list.calc) {
-                this.list.calc();
+    function findListTotals(elements) {
+        elements.each(function () {
+            var value = $(this).text();
+            if (value && !isNaN(value)) {
+                score += parseFloat(value);
             }
         });
     }
 
-    // jQuery Events
+    for (p in pointsAttr) {
+        if (pointsAttr.hasOwnProperty(p)) {
+            score = 0;
+            attr = pointsAttr[p];
+
+            findListTotals($("#board .list-total ." + attr));
+
+            $countElem = $('.board-title .list-total .' + attr);
+            if ($countElem.length > 0) {
+                $countElem.remove();
+            }
+            $total.append("<span class='" + attr + "'>" + Utils.roundValue(score) + "</span>");
+        }
+    }
+}
+
+function readList($c) {
+    'use strict';
+    $c.each(function () {
+        if (!this.list) {
+            this.list = new List(this);
+        }
+        else if (this.list.calc) {
+            this.list.calc();
+        }
+    });
+}
+
+$(function () {
+    'use strict';
 
     // watch filtering
     $(document).on('mouseup', '.js-filter-toggle', function (e) {
@@ -360,21 +365,21 @@ $(function () {
             $text,
             text,
             p, point;
-        
+
         function registerClickEvent(element) {
             element.click(function () {
-                    value = $(this).text();
-                    $text = $('.card-detail-title .edit textarea');
-                    text = $text.val();
+                value = $(this).text();
+                $text = $('.card-detail-title .edit textarea');
+                text = $text.val();
 
-                    // replace our new
-                    $text[0].value = text.match(reg) ? text.replace(reg, '(' + value + ') ') : '(' + value + ') ' + text;
+                // replace our new
+                $text[0].value = text.match(reg) ? text.replace(reg, '(' + value + ') ') : '(' + value + ') ' + text;
 
-                    // then click our button so it all gets saved away
-                    $(".card-detail-title .edit .js-save-edit").click();
+                // then click our button so it all gets saved away
+                $(".card-detail-title .edit .js-save-edit").click();
 
-                    return false;
-                });
+                return false;
+            });
         }
 
         for (p in pointSeq) {
@@ -386,7 +391,7 @@ $(function () {
         }
     });
 
-    $('body').bind('DOMSubtreeModified', function (e) {
+    $('body').on('DOMSubtreeModified', function (e) {
         if ($(e.target).hasClass('list')) {
             readList($(e.target));
             computeTotal();
