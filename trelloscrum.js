@@ -183,15 +183,19 @@ $(function () {
             var i, score, attr, scoreTruncated;
             $total.empty();
 
+            function findListCards(elements) {
+                elements.each(function () {
+                    if (this.listCard && !isNaN(Number(this.listCard[attr].points))) {
+                        score += Number(this.listCard[attr].points);
+                    }
+                });
+            }
+
             for (i in pointsAttr) {
                 if (pointsAttr.hasOwnProperty(i)) {
                     attr = pointsAttr[i];
                     score = 0;
-                    $list.find('.list-card').each(function() {
-                        if (this.listCard && !isNaN(Number(this.listCard[attr].points))) {
-                            score += Number(this.listCard[attr].points);
-                        }
-                    });
+                    findListCards($list.find('.list-card'));
                     scoreTruncated = Utils.roundValue(score);
                     $total.append('<span class="' + attr + '">' + (scoreTruncated > 0 ? scoreTruncated : '') + '</span>');
                 }
@@ -299,17 +303,21 @@ $(function () {
             $total = $("<span class='list-total'>").appendTo($title);
         }
 
+        function findListTotals(elements) {
+            elements.each(function () {
+                var value = $(this).text();
+                if (value && !isNaN(value)) {
+                    score += parseFloat(value);
+                }
+            });
+        }
+
         for (p in pointsAttr) {
             if (pointsAttr.hasOwnProperty(p)) {
                 score = 0;
                 attr = pointsAttr[p];
 
-                $("#board .list-total ." + attr).each(function () {
-                    var value = $(this).text();
-                    if (value && !isNaN(value)) {
-                        score += parseFloat(value);
-                    }
-                });
+                findListTotals($("#board .list-total ." + attr));
 
                 $countElem = $('.board-title .list-total .' + attr);
                 if ($countElem.length > 0) {
@@ -322,7 +330,6 @@ $(function () {
 
     function readList($c) {
         $c.each(function () {
-
             if (!this.list) {
                 this.list = new List(this);
             }
@@ -353,12 +360,9 @@ $(function () {
             $text,
             text,
             p, point;
-
-        for (p in pointSeq) {
-            if (pointSeq.hasOwnProperty(p)) {
-                point = pointSeq[p];
-
-                $picker.append($('<span class="point-value">').text(point).click(function () {
+        
+        function registerClickEvent(element) {
+            element.click(function () {
                     value = $(this).text();
                     $text = $('.card-detail-title .edit textarea');
                     text = $text.val();
@@ -370,7 +374,14 @@ $(function () {
                     $(".card-detail-title .edit .js-save-edit").click();
 
                     return false;
-                }));
+                });
+        }
+
+        for (p in pointSeq) {
+            if (pointSeq.hasOwnProperty(p)) {
+                point = pointSeq[p];
+
+                registerClickEvent($picker.append($('<span class="point-value">').text(point)));
             }
         }
     });
