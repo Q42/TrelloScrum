@@ -1,5 +1,5 @@
 /*
-** TrelloScrum v1.1 - https://github.com/Q42/TrelloScrum
+** Scrum for Trello- https://github.com/Q42/TrelloScrum
 ** Adds Scrum to your Trello
 **
 ** Original:
@@ -51,12 +51,13 @@ $(function(){
 	//for storypoint picker
 	$(".card-detail-title .edit-controls").live('DOMNodeInserted',showPointPicker);
 
-	$('body').bind('DOMSubtreeModified',function(e){
+	$('body').bind('DOMSubtreeModified DOMNodeInserted',function(e){
 		if($(e.target).hasClass('list')){
 			readList($(e.target));
 			computeTotal();
 		}
 	});
+
 
 	$('.js-share').live('mouseup',function(){
 		setTimeout(checkExport)
@@ -86,11 +87,13 @@ $(function(){
 	}
 
 	function readList($c){
+
 		$c.each(function(){
 			if(!this.list) new List(this);
 			else if(this.list.calc) this.list.calc();
 		})
-	};
+	}
+
 
 	readList($('.list'));
 
@@ -310,3 +313,4 @@ function showExcelExport() {
 
 	return false
 };
+
