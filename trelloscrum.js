@@ -1,5 +1,5 @@
 /*
-** TrelloScrum v1.1 - https:// github.com/Q42/TrelloScrum
+** Scrum for Trello - https://github.com/Q42/TrelloScrum
 ** Adds Scrum to your Trello
 **
 ** Original:
@@ -203,8 +203,6 @@ function List(el) {
     this.calc();
 }
 
-
-
 // forcibly calculate list totals
 function calcPoints($el) {
     'use strict';
@@ -361,13 +359,13 @@ $(function () {
         }
 
         var $picker = $('<div class="picker">').appendTo('.card-detail-title .edit-controls'),
-            value,
-            $text,
-            text,
+			$pickerPoint,
             p, point;
 
         function registerClickEvent(element) {
             element.click(function () {
+				var value, $text, text;
+				
                 value = $(this).text();
                 $text = $('.card-detail-title .edit textarea');
                 text = $text.val();
@@ -386,12 +384,16 @@ $(function () {
             if (pointSeq.hasOwnProperty(p)) {
                 point = pointSeq[p];
 
-                registerClickEvent($picker.append($('<span class="point-value">').text(point)));
+				$pickerPoint = $('<span class="point-value point-value-' + point + '">').text(point);
+				
+                registerClickEvent($pickerPoint);
+				
+				$picker.append($pickerPoint)
             }
         }
     });
 
-    $('body').on('DOMSubtreeModified', function (e) {
+    $('body').on('DOMSubtreeModified DOMNodeInserted', function (e) {
         if ($(e.target).hasClass('list')) {
             readList($(e.target));
             computeTotal();
