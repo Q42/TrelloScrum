@@ -41,12 +41,15 @@ var Utils = (function(){
 //what to do when DOM loads
 $(function(){
 	//watch filtering
-	$('.js-filter-toggle').live('mouseup',function(e){
+	function updateFilters() {
 		setTimeout(function(){
 			filtered=$('.js-filter-cards').hasClass('is-on');
 			calcPoints()
-		})
-	});
+		})		
+	}
+	$('.js-toggle-label-filter, .js-select-member, .js-due-filter, .js-clear-all').live('mouseup', updateFilters);
+	$('.js-input').live('keyup', updateFilters);
+	
 
 	//for storypoint picker
 	$(".card-detail-title .edit-controls").live('DOMNodeInserted',showPointPicker);
