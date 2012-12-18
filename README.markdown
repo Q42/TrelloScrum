@@ -1,7 +1,7 @@
-TrelloScrum
+Scrum for Trello
 ===========
 
-TrelloScrum adds functionality to the awesome trello.com for use in Scrum projects.
+Scrum for Trello adds functionality to the awesome trello.com for use in Scrum projects.
 
 Trello is the perfect online equivalent of the whiteboard with sticky notes aka the Scrum
 board. One element we use are the storypoints. TrelloScrum gives you the ability to
@@ -10,7 +10,7 @@ make use of story points in Trello.
 Setup
 -----
 
-TrelloScrum is a Chrome extension and you can install it via the Chrome Webstore.
+Scrum for Trello is a Chrome extension and you can install it via the Chrome Webstore.
 
 Or, clone this repository and load the TrelloScrum folder as an unpacked extension.
 
