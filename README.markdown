@@ -25,8 +25,6 @@ of the list.
 Every second the story points will be detected and calculated. So changing a number or moving
 a card will be reflected almost immediately.
 
-When a card is considered done, you can hit the "Done" button in the card detail allowing you 
-to remove it from the global list count (it is now counted in the done one).
 
 Credits
 -------
