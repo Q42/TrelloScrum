@@ -187,7 +187,7 @@ function ListCard(el, identifier){
 		if(!$title[0])return;
 		var title=$title[0].text;
 		var href = $title.attr('href');
-		el._title = title;
+		if(title) el._title = title;
 		if(href!=phref) {
 			phref = href;
 			parsed=title.match(regexp);
