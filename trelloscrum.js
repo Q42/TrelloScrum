@@ -113,19 +113,17 @@ function List(el){
 		to2;
 
 	var $total=$('<span class="list-total">')
-		.bind('DOMNodeRemovedFromDocument',function(){
-			clearTimeout(to);
-			to=setTimeout(function(){
-				$total.appendTo($list.find('.list-header h2'))
-			})
-		})
-		.appendTo($list.find('.list-header h2'));
 
 	$list.bind('DOMNodeInserted',function(e){
-		if($(e.target).hasClass('list-card') && !e.target.listCard) {
-			clearTimeout(to2);
-			to2=setTimeout(function(){readCard($(e.target))})
+		if($(e.target).hasClass('list-card')) {
+			if(!e.target.listCard) {
+				clearTimeout(to2);
+				to2=setTimeout(function(){readCard($(e.target))})
+			}
+			else for (var i in _pointsAttr)
+				e.target.listCard[_pointsAttr[i]].refresh();
 		}
+
 	});
 
 	function readCard($c){
@@ -134,23 +132,10 @@ function List(el){
 					 to2,
 					 busy=false;
 			if($(that).hasClass('placeholder')) return;
-			if(!that.listCard){
-				for (var i in _pointsAttr){
-					new ListCard(that, _pointsAttr[i])
-				}
-				$(that).bind('DOMNodeInserted',function(e){
-					if(!busy && ($(e.target).hasClass('list-card-title') || e.target==that)) {
-						clearTimeout(to2);
-						to2=setTimeout(function(){
-							busy=true;
-							for (var i in that.listCard){
-								that.listCard[i].refresh();
-							}
-							busy=false;
-						});
-					}
-				});
-			} 
+			if(!that.listCard) for (var i in _pointsAttr)
+				new ListCard(that, _pointsAttr[i])
+			else for (var i in _pointsAttr)
+				that.listCard[_pointsAttr[i]].refresh();
 		})
 	};
 
@@ -159,7 +144,10 @@ function List(el){
 		for (var i in _pointsAttr){
 			var score=0;
 			var attr = _pointsAttr[i];
-			$list.find('.list-card').each(function(){if(this.listCard && !isNaN(Number(this.listCard[attr].points)))score+=Number(this.listCard[attr].points)});
+			$list.find('.list-card').each(function(){
+				if(!this.listCard) return;
+				if(!isNaN(Number(this.listCard[attr].points)))score+=Number(this.listCard[attr].points)
+			});
 			var scoreTruncated = Utils.roundValue(score);			
 			$total.append('<span class="'+attr+'">'+(scoreTruncated>0?scoreTruncated:'')+'</span>');
 		}
@@ -172,6 +160,7 @@ function List(el){
 //.list-card pseudo
 function ListCard(el, identifier){
 	if(el.listCard && el.listCard[identifier]) return;
+
 	//lazily create object
 	if (!el.listCard){
 		el.listCard={};
@@ -185,30 +174,26 @@ function ListCard(el, identifier){
 		that=this,
 		busy=false,
 		to,
-		ptitle,
+		phref='',
 		$card=$(el),
-		$badge=$('<div class="badge badge-points point-count" style="background-image: url('+iconUrl+')"/>')
-			.bind('DOMSubtreeModified DOMNodeRemovedFromDocument',function(e){
-				if(busy)return;
-				busy=true;
-				clearTimeout(to);
-				to = setTimeout(function(){
-					$badge.prependTo($card.find('.badges'));
-					busy=false;
-				});
-			});
+		$badge=$('<div class="badge badge-points point-count" style="background-image: url('+iconUrl+')"/>');
 
 	this.refresh=function(){
 		var $title=$card.find('a.list-card-title');
 		if(!$title[0])return;
 		var title=$title[0].text;
-		parsed=title.match(regexp);
-		points=parsed?parsed[1]:-1;
+		var href = $title.attr('href');
+		if(href!=phref) {
+			phref = href;
+			parsed=title.match(regexp);
+			points=parsed?parsed[1]:-1;
+		}
 		if($card.parent()[0]){
 			$title[0].textContent = title.replace(regexp,'');
 			$badge.text(that.points);
 			consumed?$badge.addClass("consumed"):$badge.removeClass('consumed');
 			$badge.attr({title: 'This card has '+that.points+ (consumed?' consumed':'')+' storypoint' + (that.points == 1 ? '.' : 's.')})
+			$badge.prependTo($card.find('.badges'));
 		}
 	};
 
