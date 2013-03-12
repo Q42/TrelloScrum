@@ -124,7 +124,7 @@ function List(el){
 	$list.bind('DOMNodeInserted',function(e){
 		if($(e.target).hasClass('list-card') && !e.target.listCard) {
 			clearTimeout(to2);
-			to2=setTimeout(readCard,0,$(e.target))
+			to2=setTimeout(function(){readCard($(e.target))})
 		}
 	});
 
