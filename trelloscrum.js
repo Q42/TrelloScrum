@@ -156,8 +156,8 @@ function List(el){
 
 	setTimeout(function(){
 		readCard($list.find('.list-card'));
+		setTimeout(el.list.calc);
 	});
-	this.calc();
 };
 
 //.list-card pseudo
@@ -186,18 +186,22 @@ function ListCard(el, identifier){
 		if(!$title[0])return;
 		var title=$title[0].text;
 		var href = $title.attr('href');
+		el._title = title;
 		if(href!=phref) {
 			phref = href;
 			parsed=title.match(regexp);
 			points=parsed?parsed[1]:-1;
 		}
-		if($card.parent()[0]){
-			$title[0].textContent = title.replace(regexp,'');
-			$badge.text(that.points);
-			consumed?$badge.addClass("consumed"):$badge.removeClass('consumed');
-			$badge.attr({title: 'This card has '+that.points+ (consumed?' consumed':'')+' storypoint' + (that.points == 1 ? '.' : 's.')})
-			$badge.prependTo($card.find('.badges'));
-		}
+		setTimeout(function(){
+			$title[0].textContent = el._title = el._title.replace(regexp,'');
+			$badge
+				.text(that.points)
+				[(consumed?'add':'remove')+'Class']('consumed')
+				.attr({title: 'This card has '+that.points+ (consumed?' consumed':'')+' storypoint' + (that.points == 1 ? '.' : 's.')})
+				.prependTo($card.find('.badges'));
+			var list = $card.closest('.list');
+			if(list[0]) list[0].list.calc();
+		});
 	};
 
 	this.__defineGetter__('points',function(){
