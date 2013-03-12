@@ -13,11 +13,10 @@
 ** Morgan Craft <https://github.com/mgan59>
 ** Frank Geerlings <https://github.com/frankgeerlings>
 ** Cedric Gatay <https://github.com/CedricGatay>
-**
 */
 
 //default story point picker sequence
-var _pointSeq = ['?', 0, 1, 2, 3, 5, 8, 13, 20];
+var _pointSeq = ['?', .5, 0, 1, 2, 3, 5, 8, 13, 20];
 //attributes representing points values for card
 var _pointsAttr = ['cpoints', 'points'];
 
@@ -124,7 +123,7 @@ function List(el){
 	$list.bind('DOMNodeInserted',function(e){
 		if($(e.target).hasClass('list-card') && !e.target.listCard) {
 			clearTimeout(to2);
-			to2=setTimeout(readCard,0,$(e.target))
+			to2=setTimeout(function(){readCard($(e.target))})
 		}
 	});
 
