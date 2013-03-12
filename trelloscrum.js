@@ -67,41 +67,41 @@ $(function(){
 		setTimeout(checkExport)
 	});
 	
-	function computeTotal(){
-		var $title = $("#board-header");
-		var $total = $("#board-header .list-total");
-		if ($total.length == 0){
-			$total = $("<span class='list-total'>").appendTo($title);
-		}
-		for (var i in _pointsAttr){
-			var score = 0;
-			var attr = _pointsAttr[i];
-			$("#board .list-total ."+attr).each(function(){ 
-				var value = $(this).text();
-				if (value && !isNaN(value)){
-					score+=parseFloat(value);
-				} 
-			});
-			var $countElem = $('#board-header .list-total .'+attr);
-			if ($countElem.length > 0){
-				$countElem.remove();
-			}
-			$total.append("<span class='"+attr+"'>"+Utils.roundValue(score)+"</span>");
-		}
-	}
-
-	function readList($c){
-
-		$c.each(function(){
-			if(!this.list) new List(this);
-			else if(this.list.calc) this.list.calc();
-		})
-	}
-
-
 	readList($('.list'));
 
 });
+
+function computeTotal(){
+	var $title = $("#board-header");
+	var $total = $("#board-header .list-total");
+	if ($total.length == 0){
+		$total = $("<span class='list-total'>").appendTo($title);
+	}
+	for (var i in _pointsAttr){
+		var score = 0;
+		var attr = _pointsAttr[i];
+		$("#board .list-total ."+attr).each(function(){ 
+			var value = $(this).text();
+			if (value && !isNaN(value)){
+				score+=parseFloat(value);
+			} 
+		});
+		var $countElem = $('#board-header .list-total .'+attr);
+		if ($countElem.length > 0){
+			$countElem.remove();
+		}
+		$total.append("<span class='"+attr+"'>"+Utils.roundValue(score)+"</span>");
+	}
+}
+
+function readList($c){
+
+	$c.each(function(){
+		if(!this.list) new List(this);
+		else if(this.list.calc) this.list.calc();
+	})
+}
+
 
 //.list pseudo
 function List(el){
@@ -151,6 +151,7 @@ function List(el){
 			});
 			var scoreTruncated = Utils.roundValue(score);			
 			$total.append('<span class="'+attr+'">'+(scoreTruncated>0?scoreTruncated:'')+'</span>');
+			computeTotal();
 		}
 	};
 
