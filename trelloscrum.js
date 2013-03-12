@@ -13,11 +13,12 @@
 ** Morgan Craft <https://github.com/mgan59>
 ** Frank Geerlings <https://github.com/frankgeerlings>
 ** Cedric Gatay <https://github.com/CedricGatay>
+** Kit Glennon <https://github.com/kitglen>
 **
 */
 
 //default story point picker sequence
-var _pointSeq = ['?', 0, 1, 2, 3, 5, 8, 13, 20];
+var _pointSeq = ['?', 0, .5, 1, 2, 3, 5, 8, 13, 20];
 //attributes representing points values for card
 var _pointsAttr = ['cpoints', 'points'];
 
@@ -153,7 +154,9 @@ function List(el){
 		}
 	};
 
-	readCard($list.find('.list-card'));
+	setTimeout(function(){
+		readCard($list.find('.list-card'));
+	});
 	this.calc();
 };
 
@@ -202,7 +205,7 @@ function ListCard(el, identifier){
 		return parsed&&(!filtered||($card.css('opacity')==1 && $card.css('display')!='none'))?points:''
 	});
 
-	this.refresh();
+	setTimeout(that.refresh);
 };
 
 //forcibly calculate list totals
