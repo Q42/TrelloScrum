@@ -201,11 +201,11 @@ function ListCard(el, identifier){
 	this.refresh=function(){
 		var $title=$card.find('a.list-card-title');
 		if(!$title[0])return;
-		var title=$title[0].text;
+		var title=$title[0].childNodes[1].data;
 		parsed=title.match(regexp);
 		points=parsed?parsed[1]:-1;
 		if($card.parent()[0]){
-			$title[0].textContent = title.replace(regexp,'');
+			$title[0].childNodes[1].data = title.replace(regexp,'');
 			$badge.text(that.points);
 			consumed?$badge.addClass("consumed"):$badge.removeClass('consumed');
 			$badge.attr({title: 'This card has '+that.points+ (consumed?' consumed':'')+' storypoint' + (that.points == 1 ? '.' : 's.')})
