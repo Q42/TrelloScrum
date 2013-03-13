@@ -141,7 +141,7 @@ function List(el){
 	};
 
 	this.calc = function(){
-		$total.empty().appendTo($list.find('.list-header'));
+		$total.empty().appendTo($list.find('.list-title'));
 		for (var i in _pointsAttr){
 			var score=0;
 			var attr = _pointsAttr[i];
