@@ -30,14 +30,7 @@ var filtered = false, //watch for filtered cards
 	iconUrl = chrome.extension.getURL('images/storypoints-icon.png'),
 	pointsDoneUrl = chrome.extension.getURL('images/points-done.png');
 
-var Utils = (function(){
-	function _roundValue(_val){
-		return (Math.floor(_val * 100) / 100);
-	}
-	return {
-		roundValue : _roundValue
-	}
-})();
+function round(_val) {return (Math.floor(_val * 100) / 100)};
 
 //what to do when DOM loads
 $(function(){
@@ -45,63 +38,55 @@ $(function(){
 	function updateFilters() {
 		setTimeout(function(){
 			filtered=$('.js-filter-cards').hasClass('is-on');
-			calcPoints()
+			calcListPoints()
 		})		
 	}
 	$('.js-toggle-label-filter, .js-select-member, .js-due-filter, .js-clear-all').live('mouseup', updateFilters);
 	$('.js-input').live('keyup', updateFilters);
-	
 
 	//for storypoint picker
 	$(".card-detail-title .edit-controls").live('DOMNodeInserted',showPointPicker);
 
 	$('body').bind('DOMSubtreeModified DOMNodeInserted',function(e){
-		if($(e.target).hasClass('list')){
-			readList($(e.target));
+		var $t = $(e.target);
+		if($t.hasClass('list')){
+			calcListPoints($t);
 			computeTotal();
 		}
 	});
 
-
 	$('.js-share').live('mouseup',function(){
 		setTimeout(checkExport)
 	});
-	
-	readList($('.list'));
+
+	calcListPoints();
 
 });
 
+//calculate board totals
 function computeTotal(){
-	var $title = $("#board-header");
-	var $total = $("#board-header .list-total");
-	if ($total.length == 0){
-		$total = $("<span class='list-total'>").appendTo($title);
-	}
+	var $title = $('#board-header');
+	var $total = $title.children('.list-total').empty();
+	if ($total.length == 0)
+		$total = $('<span class="list-total">').appendTo($title);
+
 	for (var i in _pointsAttr){
-		var score = 0;
-		var attr = _pointsAttr[i];
-		$("#board .list-total ."+attr).each(function(){ 
-			var value = $(this).text();
-			if (value && !isNaN(value)){
-				score+=parseFloat(value);
-			} 
+		var score = 0,
+			attr = _pointsAttr[i];
+		$('#board .list-total .'+attr).each(function(){
+			score+=parseFloat(this.textContent)||0;
 		});
-		var $countElem = $('#board-header .list-total .'+attr);
-		if ($countElem.length > 0){
-			$countElem.remove();
-		}
-		$total.append("<span class='"+attr+"'>"+Utils.roundValue(score)+"</span>");
+		$total.append('<span class="'+attr+'">'+(round(score)||'')+'</span>');
 	}
-}
+};
 
-function readList($c){
-
-	$c.each(function(){
+//calculate list totals
+function calcListPoints($el){
+	($el||$('.list')).each(function(){
 		if(!this.list) new List(this);
 		else if(this.list.calc) this.list.calc();
 	})
-}
-
+};
 
 //.list pseudo
 function List(el){
@@ -149,7 +134,7 @@ function List(el){
 				if(!this.listCard) return;
 				if(!isNaN(Number(this.listCard[attr].points)))score+=Number(this.listCard[attr].points)
 			});
-			var scoreTruncated = Utils.roundValue(score);			
+			var scoreTruncated = round(score);
 			$total.append('<span class="'+attr+'">'+(scoreTruncated>0?scoreTruncated:'')+'</span>');
 			computeTotal();
 		}
@@ -211,11 +196,6 @@ function ListCard(el, identifier){
 	});
 
 	setTimeout(that.refresh);
-};
-
-//forcibly calculate list totals
-function calcPoints($el){
-	($el||$('.list')).each(function(){if(this.list)this.list.calc()})
 };
 
 //the story point picker
