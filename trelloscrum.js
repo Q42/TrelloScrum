@@ -18,7 +18,7 @@
 */
 
 //default story point picker sequence
-var _pointSeq = ['?', 0, .5, 1, 2, 3, 5, 8, 13, 20];
+var _pointSeq = ['?', 0, .5, 1, 2, 3, 5, 8, 13, 21];
 //attributes representing points values for card
 var _pointsAttr = ['cpoints', 'points'];
 
