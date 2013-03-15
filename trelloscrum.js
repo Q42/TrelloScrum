@@ -48,7 +48,7 @@ $(function(){
 	$(".card-detail-title .edit-controls").live('DOMNodeInserted',showPointPicker);
 
 	$('.js-share').live('mouseup',function(){
-		setTimeout(checkExport)
+		setTimeout(checkExport,500)
 	});
 
 	calcListPoints();
@@ -213,29 +213,23 @@ function showPointPicker() {
 //for export
 var $excel_btn,$excel_dl;
 window.URL = window.webkitURL || window.URL;
-window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
 
 function checkExport() {
-	if($('form').find('.js-export-excel').length) return;
-	var $js_btn = $('form').find('.js-export-json');
-	if($js_btn.length)
-		$excel_btn = $('<a>')
-			.attr({
-				style: 'margin: 0 4px 4px 0;',
-				class: 'button js-export-excel',
-				href: '#',
-				target: '_blank',
-				title: 'Open downloaded file with Excel'
-			})
-			.text('Excel')
+	if($excel_btn && $excel_btn.filter(':visible').length) return;
+	if($('.pop-over-list').find('.js-export-excel').length) return;
+	var $js_btn = $('.pop-over-list').find('.js-export-json');
+	var $ul = $js_btn.closest('ul:visible');
+	if(!$js_btn.length) return;
+	$js_btn.parent().after($('<li>').append(
+		$excel_btn = $('<a href="#" target="_blank" title="Open downloaded file with Excel">Excel</a>')
 			.click(showExcelExport)
-			.insertAfter($js_btn);
-}
+		))
+};
 
 function showExcelExport() {
 	$excel_btn.text('Generating...');
 
-	$.getJSON($('form').find('.js-export-json').attr('href'), function(data) {
+	$.getJSON($('.pop-over-list').find('.js-export-json').attr('href'), function(data) {
 		var s = '<table id="export" border=1>';
 		s += '<tr><th>Points</th><th>Story</th><th>Description</th></tr>';
 		$.each(data['lists'], function(key, list) {
@@ -255,9 +249,8 @@ function showExcelExport() {
 		});
 		s += '</table>';
 
-		var bb = new BlobBuilder();
-		bb.append(s);
-		
+		var blob = new Blob([s],{type:'application/ms-excel'});
+
 		var board_title_reg = /.*\/board\/(.*)\//;
 		var board_title_parsed = document.location.href.match(board_title_reg);
 		var board_title = board_title_parsed[1];
@@ -268,7 +261,7 @@ function showExcelExport() {
 				$excel_dl=$('<a>')
 					.attr({
 						download: board_title + '.xls',
-						href: window.URL.createObjectURL(bb.getBlob('application/ms-excel'))
+						href: window.URL.createObjectURL(blob)
 					})
 			);
 
