@@ -47,14 +47,6 @@ $(function(){
 	//for storypoint picker
 	$(".card-detail-title .edit-controls").live('DOMNodeInserted',showPointPicker);
 
-	$('body').bind('DOMSubtreeModified DOMNodeInserted',function(e){
-		var $t = $(e.target);
-		if($t.hasClass('list')){
-			calcListPoints($t);
-			computeTotal();
-		}
-	});
-
 	$('.js-share').live('mouseup',function(){
 		setTimeout(checkExport)
 	});
@@ -63,21 +55,29 @@ $(function(){
 
 });
 
-//calculate board totals
-function computeTotal(){
-	var $title = $('#board-header');
-	var $total = $title.children('.list-total').empty();
-	if ($total.length == 0)
-		$total = $('<span class="list-total">').appendTo($title);
+document.body.addEventListener('DOMNodeInserted',function(e){
+	if(e.target.id=='board') setTimeout(calcListPoints);
+});
 
-	for (var i in _pointsAttr){
-		var score = 0,
-			attr = _pointsAttr[i];
-		$('#board .list-total .'+attr).each(function(){
-			score+=parseFloat(this.textContent)||0;
-		});
-		$total.append('<span class="'+attr+'">'+(round(score)||'')+'</span>');
-	}
+//calculate board totals
+var ctto;
+function computeTotal(){
+	clearTimeout(ctto);
+	ctto = setTimeout(function(){
+		var $title = $('#board-header');
+		var $total = $title.children('.list-total').empty();
+		if ($total.length == 0)
+			$total = $('<span class="list-total">').appendTo($title);
+
+		for (var i in _pointsAttr){
+			var score = 0,
+				attr = _pointsAttr[i];
+			$('#board .list-total .'+attr).each(function(){
+				score+=parseFloat(this.textContent)||0;
+			});
+			$total.append('<span class="'+attr+'">'+(round(score)||'')+'</span>');
+		}
+	});
 };
 
 //calculate list totals
@@ -94,51 +94,41 @@ function List(el){
 	el.list=this;
 
 	var $list=$(el),
+		$total=$('<span class="list-total">'),
 		busy = false,
 		to,
 		to2;
 
-	var $total=$('<span class="list-total">')
-
-	$list.bind('DOMNodeInserted',function(e){
-		if($(e.target).hasClass('list-card')) {
-			if(!e.target.listCard) {
-				clearTimeout(to2);
-				to2=setTimeout(function(){readCard($(e.target))})
-			}
-			else for (var i in _pointsAttr)
-				e.target.listCard[_pointsAttr[i]].refresh();
-		}
-
-	});
-
 	function readCard($c){
+		if($c.target) $c = $($c.target).filter('.list-card:not(.placeholder)');
 		$c.each(function(){
-			var that=this,
-					 to2,
-					 busy=false;
-			if($(that).hasClass('placeholder')) return;
-			if(!that.listCard) for (var i in _pointsAttr)
-				new ListCard(that, _pointsAttr[i])
+			if(!this.listCard) for (var i in _pointsAttr)
+				new ListCard(this,_pointsAttr[i]);
 			else for (var i in _pointsAttr)
-				that.listCard[_pointsAttr[i]].refresh();
-		})
+				setTimeout(this.listCard[_pointsAttr[i]].refresh);
+		});
 	};
 
-	this.calc = function(){
-		$total.empty().appendTo($list.find('.list-title'));
-		for (var i in _pointsAttr){
-			var score=0;
-			var attr = _pointsAttr[i];
-			$list.find('.list-card').each(function(){
-				if(!this.listCard) return;
-				if(!isNaN(Number(this.listCard[attr].points)))score+=Number(this.listCard[attr].points)
-			});
-			var scoreTruncated = round(score);
-			$total.append('<span class="'+attr+'">'+(scoreTruncated>0?scoreTruncated:'')+'</span>');
-			computeTotal();
-		}
+	this.calc = function(e){
+		if(e&&e.target&&!$(e.target).hasClass('list-card')) return;
+		clearTimeout(to);
+		to = setTimeout(function(){
+			$total.empty().appendTo($list.find('.list-title'));
+			for (var i in _pointsAttr){
+				var score=0,
+					attr = _pointsAttr[i];
+				$list.find('.list-card:not(.placeholder)').each(function(){
+					if(!this.listCard) return;
+					if(!isNaN(Number(this.listCard[attr].points)))score+=Number(this.listCard[attr].points)
+				});
+				var scoreTruncated = round(score);
+				$total.append('<span class="'+attr+'">'+(scoreTruncated>0?scoreTruncated:'')+'</span>');
+				computeTotal();
+			}
+		});
 	};
+
+	$list.on('DOMNodeRemoved',this.calc).on('DOMNodeInserted',readCard);
 
 	setTimeout(function(){
 		readCard($list.find('.list-card'));
@@ -168,25 +158,27 @@ function ListCard(el, identifier){
 		$badge=$('<div class="badge badge-points point-count" style="background-image: url('+iconUrl+')"/>');
 
 	this.refresh=function(){
-		var $title=$card.find('a.list-card-title');
-		if(!$title[0])return;
-		var title=$title[0].text;
-		var href = $title.attr('href');
-		if(title) el._title = title;
-		if(href!=phref) {
-			phref = href;
-			parsed=title.match(regexp);
-			points=parsed?parsed[1]:-1;
-		}
 		setTimeout(function(){
-			$title[0].textContent = el._title = el._title.replace(regexp,'');
-			$badge
-				.text(that.points)
-				[(consumed?'add':'remove')+'Class']('consumed')
-				.attr({title: 'This card has '+that.points+ (consumed?' consumed':'')+' storypoint' + (that.points == 1 ? '.' : 's.')})
-				.prependTo($card.find('.badges'));
-			var list = $card.closest('.list');
-			if(list[0]) list[0].list.calc();
+			var $title=$card.find('a.list-card-title');
+			if(!$title[0])return;
+			var title=$title[0].text;
+			var href = $title.attr('href');
+			if(title) el._title = title;
+			if(href!=phref) {
+				phref = href;
+				parsed=title.match(regexp);
+				points=parsed?parsed[1]:-1;
+			}
+			setTimeout(function(){
+				$title[0].textContent = el._title = el._title.replace(regexp,'');
+				$badge
+					.text(that.points)
+					[(consumed?'add':'remove')+'Class']('consumed')
+					.attr({title: 'This card has '+that.points+ (consumed?' consumed':'')+' storypoint' + (that.points == 1 ? '.' : 's.')})
+					.prependTo($card.find('.badges'));
+				var list = $card.closest('.list');
+				if(list[0]) list[0].list.calc();
+			})
 		});
 	};
 
