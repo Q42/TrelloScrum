@@ -161,7 +161,9 @@ function ListCard(el, identifier){
 		setTimeout(function(){
 			var $title=$card.find('a.list-card-title');
 			if(!$title[0])return;
-			var title=$title[0].text;
+			//var title=$title[0].text;
+			var title=$title[0].childNodes[1].textContent;
+			var idSpan=$title[0].childNodes[0].outerHTML;			
 			var href = $title.attr('href');
 			if(title) el._title = title;
 			if(href!=phref) {
@@ -171,6 +173,10 @@ function ListCard(el, identifier){
 			}
 			setTimeout(function(){
 				$title[0].textContent = el._title = el._title.replace(regexp,'');
+				try {
+					if (idSpan && (!$($title[0]).childNodes || ($($title[0]).childNodes && ($($title[0]).childNodes.length < 2))))         
+						$($title[0]).prepend(idSpan);
+				} catch (err) { }
 				$badge
 					.text(that.points)
 					[(consumed?'add':'remove')+'Class']('consumed')
