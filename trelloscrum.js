@@ -179,7 +179,7 @@ function ListCard(el, identifier){
 
 				//only update title text and list totals once
 				if(!consumed) {
-					$title[0].textContent = el._title = $.trim(el._title.replace(reg,'$1').replace(regC,'$1'));
+					$title[0].childNodes[1].textContent = el._title = $.trim(el._title.replace(reg,'$1').replace(regC,'$1'));
 					var list = $card.closest('.list');
 					if(list[0]) list[0].list.calc();
 				}
