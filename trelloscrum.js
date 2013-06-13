@@ -117,7 +117,7 @@ function List(el){
 			for (var i in _pointsAttr){
 				var score=0,
 					attr = _pointsAttr[i];
-				$list.find('.list-card:not(.placeholder)').each(function(){
+				$list.find('.list-card:not(.placeholder):visible').each(function(){
 					if(!this.listCard) return;
 					if(!isNaN(Number(this.listCard[attr].points)))score+=Number(this.listCard[attr].points)
 				});
