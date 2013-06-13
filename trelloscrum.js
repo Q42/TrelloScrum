@@ -25,8 +25,7 @@ var _pointsAttr = ['cpoints', 'points'];
 
 
 //internals
-var filtered = false, //watch for filtered cards
-	reg = /((?:^|\s))\((\x3f|\d*\.?\d+)(\))\s?/m, //parse regexp- accepts digits, decimals and '?', surrounded by ()
+var reg = /((?:^|\s))\((\x3f|\d*\.?\d+)(\))\s?/m, //parse regexp- accepts digits, decimals and '?', surrounded by ()
 	regC = /((?:^|\s))\[(\x3f|\d*\.?\d+)(\])\s?/m, //parse regexp- accepts digits, decimals and '?', surrounded by []
 	iconUrl = chrome.extension.getURL('images/storypoints-icon.png'),
 	pointsDoneUrl = chrome.extension.getURL('images/points-done.png');
@@ -37,11 +36,8 @@ function round(_val) {return (Math.floor(_val * 100) / 100)};
 $(function(){
 	//watch filtering
 	function updateFilters() {
-		setTimeout(function(){
-			filtered=$('.js-filter-cards').hasClass('is-on');
-			calcListPoints()
-		})		
-	}
+		setTimeout(calcListPoints);
+	};
 	$('.js-toggle-label-filter, .js-select-member, .js-due-filter, .js-clear-all').live('mouseup', updateFilters);
 	$('.js-input').live('keyup', updateFilters);
 
@@ -192,8 +188,7 @@ function ListCard(el, identifier){
 	};
 
 	this.__defineGetter__('points',function(){
-		//don't add to total when filtered out
-		return parsed&&(!filtered||($card.css('opacity')==1 && $card.css('display')!='none'))?points:''
+		return parsed?points:''
 	});
 
 	setTimeout(that.refresh);
