@@ -154,12 +154,14 @@ function ListCard(el, identifier){
 		that=this,
 		busy=false,
 		to,
+		to2,
 		phref='',
 		$card=$(el),
 		$badge=$('<div class="badge badge-points point-count" style="background-image: url('+iconUrl+')"/>');
 
 	this.refresh=function(){
-		setTimeout(function(){
+		clearTimeout(to);
+		to = setTimeout(function(){
 			var $title=$card.find('a.list-card-title');
 			if(!$title[0])return;
 			var title=$title[0].text;
@@ -170,15 +172,20 @@ function ListCard(el, identifier){
 				parsed=title.match(regexp);
 				points=parsed?parsed[1]:-1;
 			}
-			setTimeout(function(){
-				$title[0].textContent = el._title = el._title.replace(regexp,'');
+			clearTimeout(to2);
+			to2 = setTimeout(function(){
 				$badge
 					.text(that.points)
 					[(consumed?'add':'remove')+'Class']('consumed')
 					.attr({title: 'This card has '+that.points+ (consumed?' consumed':'')+' storypoint' + (that.points == 1 ? '.' : 's.')})
 					.prependTo($card.find('.badges'));
-				var list = $card.closest('.list');
-				if(list[0]) list[0].list.calc();
+
+				//only update title text and list totals once
+				if(!consumed) {
+					$title[0].textContent = el._title = $.trim(el._title.replace(reg,' ').replace(regC,' '));
+					var list = $card.closest('.list');
+					if(list[0]) list[0].list.calc();
+				}
 			})
 		});
 	};
