@@ -14,6 +14,7 @@
 ** Frank Geerlings <https://github.com/frankgeerlings>
 ** Cedric Gatay <https://github.com/CedricGatay>
 ** Kit Glennon <https://github.com/kitglen>
+** Samuel Gaus <https://github.com/gausie>
 **
 */
 
@@ -25,8 +26,8 @@ var _pointsAttr = ['cpoints', 'points'];
 
 //internals
 var filtered = false, //watch for filtered cards
-	reg = /(?:^|\s)[\(](\x3f|\d*\.?\d+)([\)])\s?/m, //parse regexp- accepts digits, decimals and '?', surrounded by ()
-	regC = /(?:^|\s)[\[](\x3f|\d*\.?\d+)([\]])\s?/m, //parse regexp- accepts digits, decimals and '?', surrounded by []
+	reg = /((?:^|\s))\((\x3f|\d*\.?\d+)(\))\s?/m, //parse regexp- accepts digits, decimals and '?', surrounded by ()
+	regC = /((?:^|\s))\[(\x3f|\d*\.?\d+)(\])\s?/m, //parse regexp- accepts digits, decimals and '?', surrounded by []
 	iconUrl = chrome.extension.getURL('images/storypoints-icon.png'),
 	pointsDoneUrl = chrome.extension.getURL('images/points-done.png');
 
@@ -170,7 +171,7 @@ function ListCard(el, identifier){
 			if(href!=phref) {
 				phref = href;
 				parsed=title.match(regexp);
-				points=parsed?parsed[1]:-1;
+				points=parsed?parsed[2]:-1;
 			}
 			clearTimeout(to2);
 			to2 = setTimeout(function(){
@@ -182,7 +183,7 @@ function ListCard(el, identifier){
 
 				//only update title text and list totals once
 				if(!consumed) {
-					$title[0].textContent = el._title = $.trim(el._title.replace(reg,' ').replace(regC,' '));
+					$title[0].textContent = el._title = $.trim(el._title.replace(reg,'$1').replace(regC,'$1'));
 					var list = $card.closest('.list');
 					if(list[0]) list[0].list.calc();
 				}
