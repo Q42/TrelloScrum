@@ -57,6 +57,7 @@ $(function(){
 
 document.body.addEventListener('DOMNodeInserted',function(e){
 	if(e.target.id=='board') setTimeout(calcListPoints);
+	else if($(e.target).hasClass('board-name')) computeTotal();
 });
 
 //calculate board totals
