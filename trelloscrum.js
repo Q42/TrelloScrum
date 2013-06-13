@@ -161,7 +161,7 @@ function ListCard(el, identifier){
 		to = setTimeout(function(){
 			var $title=$card.find('a.list-card-title');
 			if(!$title[0])return;
-			var title=$title[0].text;
+			var title=$title[0].childNodes[1].textContent;
 			var href = $title.attr('href');
 			if(title) el._title = title;
 			if(href!=phref) {
