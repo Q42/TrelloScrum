@@ -211,6 +211,20 @@ function showPointPicker() {
 
 		return false
 	}))
+	$picker.append('<br>');
+	for (var i in _pointSeq) $picker.append($('<span class="consumed point-value">').text(_pointSeq[i]).click(function(){
+		var value = $(this).text();
+		var $text = $('.card-detail-title .edit textarea');
+		var text = $text.val();
+
+		// replace our new
+		$text[0].value=text.match(regC)?text.replace(regC, ' ['+value+']'): text + ' ['+value+']';
+
+		// then click our button so it all gets saved away
+		$(".card-detail-title .edit .js-save-edit").click();
+
+		return false
+	}))
 };
 
 

@@ -38,7 +38,7 @@
 
 .picker {
 	float: right;
-	padding-top: 5px;
+	line-height: 1.7em;
 }
 
 .points-done-icon{
@@ -65,6 +65,6 @@
 	display: none;
 }
 
-.badge-points.consumed{
+.badge-points.consumed, .point-value.consumed{
 	opacity: 0.5;
 }
