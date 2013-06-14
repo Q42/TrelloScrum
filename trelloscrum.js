@@ -201,25 +201,25 @@ function showPointPicker() {
 	var i;
 	if($(this).find('.picker').length) return;
 
-	var $picker = $('<div class="picker">').appendTo('.card-detail-title .edit-controls');
-	for (i in _pointSeq) $picker.append(createPointButton(_pointSeq[i], false));
-	$picker.append('<br>');
-	for (i in _pointSeq) $picker.append(createPointButton(_pointSeq[i], true));
+	var $controls = $('.card-detail-title .edit-controls');
+
+	var $estimated = $('<div class="picker first-picker"><span class="quiet">Estimated </span>').appendTo($controls);
+	for (i in _pointSeq) $estimated.append(createPointButton(_pointSeq[i], false));
+	var $consumed = $('<div class="consumed picker"><span class="quiet">Consumed </span>').appendTo($controls);
+	for (i in _pointSeq) $consumed.append(createPointButton(_pointSeq[i], true));
 }
 
 function createPointButton(points, isConsumed) {
 	var regex, value;
-	var klass = 'point-value';
 	if (isConsumed) {
 		regex = regC;
-		klass += ' consumed';
 		value = ' [' + points + ']';
 	} else {
 		regex = reg;
 		value = '(' + points + ') ';
 	}
 
-	return $('<span class="' + klass + '">').text(points).click(function(){
+	return $('<span class="point-value">').text(points).click(function(){
 		var $text = $('.card-detail-title .edit textarea');
 		var text = $text.val();
 
