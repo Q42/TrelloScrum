@@ -17,6 +17,8 @@
 ** Samuel Gaus <https://github.com/gausie>
 **
 */
+/*global chrome */
+/*jshint browser: true, jquery:true */
 
 //default story point picker sequence
 var _pointSeq = ['?', 0, .5, 1, 2, 3, 5, 8, 13, 21];
@@ -196,37 +198,44 @@ function ListCard(el, identifier){
 
 //the story point picker
 function showPointPicker() {
+	var i;
 	if($(this).find('.picker').length) return;
+
 	var $picker = $('<div class="picker">').appendTo('.card-detail-title .edit-controls');
-	for (var i in _pointSeq) $picker.append($('<span class="point-value">').text(_pointSeq[i]).click(function(){
-		var value = $(this).text();
-		var $text = $('.card-detail-title .edit textarea');
-		var text = $text.val();
-
-		// replace our new
-		$text[0].value=text.match(reg)?text.replace(reg, '('+value+') '):'('+value+') ' + text;
-
-		// then click our button so it all gets saved away
-		$(".card-detail-title .edit .js-save-edit").click();
-
-		return false
-	}))
+	for (i in _pointSeq) $picker.append(createPointButton(_pointSeq[i], false));
 	$picker.append('<br>');
-	for (var i in _pointSeq) $picker.append($('<span class="consumed point-value">').text(_pointSeq[i]).click(function(){
-		var value = $(this).text();
+	for (i in _pointSeq) $picker.append(createPointButton(_pointSeq[i], true));
+}
+
+function createPointButton(points, isConsumed) {
+	var regex, value;
+	var klass = 'point-value';
+	if (isConsumed) {
+		regex = regC;
+		klass += ' consumed';
+		value = ' [' + points + ']';
+	} else {
+		regex = reg;
+		value = '(' + points + ') ';
+	}
+
+	return $('<span class="' + klass + '">').text(points).click(function(){
 		var $text = $('.card-detail-title .edit textarea');
 		var text = $text.val();
 
 		// replace our new
-		$text[0].value=text.match(regC)?text.replace(regC, ' ['+value+']'): text + ' ['+value+']';
+		if (text.match(regex)) {
+			$text[0].value = text.replace(regex, value);
+		} else {
+			$text[0].value = isConsumed ? text + value : value + text;
+		}
 
 		// then click our button so it all gets saved away
 		$(".card-detail-title .edit .js-save-edit").click();
 
-		return false
-	}))
-};
-
+		return false;
+	});
+}
 
 //for export
 var $excel_btn,$excel_dl;
