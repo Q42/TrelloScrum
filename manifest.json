@@ -1,6 +1,6 @@
 {
 	"name": "Scrum for Trello",
-	"version": "1.36",
+	"version": "1.4",
 	"description": "Adds Scrum to your Trello",
 	"content_scripts": [
 		{
