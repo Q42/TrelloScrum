@@ -41,6 +41,10 @@
 	padding-top: 5px;
 }
 
+.consumed.picker {
+	padding-top: 0;
+}
+
 .points-done-icon{
 	background-position: 0px 3px !important;
 	background-repeat: no-repeat !important;
@@ -65,6 +69,6 @@
 	display: none;
 }
 
-.badge-points.consumed{
+.badge-points.consumed, .consumed .point-value{
 	opacity: 0.5;
 }
