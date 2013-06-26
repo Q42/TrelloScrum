@@ -30,7 +30,7 @@ var reg = /((?:^|\s))\((\x3f|\d*\.?\d+)(\))\s?/m, //parse regexp- accepts digits
 	iconUrl = chrome.extension.getURL('images/storypoints-icon.png'),
 	pointsDoneUrl = chrome.extension.getURL('images/points-done.png');
 
-function round(_val) {return (Math.floor(_val * 100) / 100)};
+function round(_val) {return (Math.round(_val * 100) / 100)};
 
 //what to do when DOM loads
 $(function(){
