@@ -68,3 +68,10 @@
 .badge-points.consumed{
 	opacity: 0.5;
 }
+
+/* == b4t integration==*/
+#burndownLink .icon-sm{
+    padding:6px;
+    margin-top:1px;
+}
+/* == end b4t integration == */

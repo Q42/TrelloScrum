@@ -15,8 +15,32 @@
 ** Cedric Gatay <https://github.com/CedricGatay>
 ** Kit Glennon <https://github.com/kitglen>
 ** Samuel Gaus <https://github.com/gausie>
+** Sean Colombo <https://github.com/seancolombo>
 **
 */
+
+// Thanks @unscriptable - http://unscriptable.com/2009/03/20/debouncing-javascript-methods/
+var debounce = function (func, threshold, execAsap) {
+    var timeout;
+    return function debounced () {
+		var obj = this, args = arguments;
+		function delayed () {
+			if (!execAsap)
+				func.apply(obj, args);
+			timeout = null; 
+		};
+
+		if (timeout)
+			clearTimeout(timeout);
+		else if (execAsap)
+			func.apply(obj, args);
+
+		timeout = setTimeout(delayed, threshold || 100); 
+	};
+}
+
+// For MutationObserver
+var obsConfig = { childList: true, characterData: true, attributes: false, subtree: true };
 
 //default story point picker sequence
 var _pointSeq = ['?', 0, .5, 1, 2, 3, 5, 8, 13, 21];
@@ -26,10 +50,24 @@ var _pointsAttr = ['cpoints', 'points'];
 
 //internals
 var reg = /((?:^|\s))\((\x3f|\d*\.?\d+)(\))\s?/m, //parse regexp- accepts digits, decimals and '?', surrounded by ()
-	regC = /((?:^|\s))\[(\x3f|\d*\.?\d+)(\])\s?/m, //parse regexp- accepts digits, decimals and '?', surrounded by []
-	iconUrl = chrome.extension.getURL('images/storypoints-icon.png'),
+    regC = /((?:^|\s))\[(\x3f|\d*\.?\d+)(\])\s?/m, //parse regexp- accepts digits, decimals and '?', surrounded by []
+    iconUrl,
+    pointsDoneUrl;
+if(typeof chrome !== 'undefined'){
+    // Works in Chrome
+	iconUrl = chrome.extension.getURL('images/storypoints-icon.png');
 	pointsDoneUrl = chrome.extension.getURL('images/points-done.png');
-
+    flameUrl = chrome.extension.getURL('images/burndown_for_trello_icon_12x12.png');
+    flame18Url = chrome.extension.getURL('images/burndown_for_trello_icon_18x18.png');
+} else {
+	// Works in Firefox Add-On
+	if(typeof self.options != 'undefined'){ // options defined in main.js
+		iconUrl = self.options.iconUrl;
+		pointsDoneUrl = self.options.pointsDoneUrl;
+        flameUrl = self.options.flameUrl;
+        flame18Url = self.options.flame18Url;
+	}
+}
 function round(_val) {return (Math.floor(_val * 100) / 100)};
 
 //what to do when DOM loads
@@ -40,22 +78,131 @@ $(function(){
 	};
 	$('.js-toggle-label-filter, .js-select-member, .js-due-filter, .js-clear-all').live('mouseup', updateFilters);
 	$('.js-input').live('keyup', updateFilters);
-
-	//for storypoint picker
-	$(".card-detail-title .edit-controls").live('DOMNodeInserted',showPointPicker);
-
 	$('.js-share').live('mouseup',function(){
 		setTimeout(checkExport,500)
 	});
 
 	calcListPoints();
-
 });
 
-document.body.addEventListener('DOMNodeInserted',function(e){
-	if(e.target.id=='board') setTimeout(calcListPoints);
-	else if($(e.target).hasClass('board-name')) computeTotal();
+var recalcListAndTotal = debounce(function(){
+    calcListPoints();
+    computeTotal();
+}, 500, false);
+
+var recalcTotalsObserver = new MutationObserver(function(mutations)
+{
+	/*if(e.target.id=='board')
+	{
+		setTimeout(calcListPoints);
+	}
+	else if($(e.target).hasClass('board-name'))
+	{
+		computeTotal();
+	}*/
+    
+    recalcListAndTotal();
+    
+    $editControls = $(".card-detail-title .edit-controls");
+    if($editControls.length > 0)
+    {
+        showPointPicker($editControls.get(0));
+    }
+    
+	/*if($(e.target).hasClass('card-detail-title') && $(e.target).find('.edit-controls').length > 0)
+	{
+		showPointPicker();
+	}*/
 });
+recalcTotalsObserver.observe(document.body, obsConfig);
+
+// Refreshes the link to the Burndown Chart dialog.
+function updateBurndownLink(){
+    // Add the link for Burndown Charts
+    //$('#burndownLink').remove();
+    if($('#burndownLink').length === 0){
+        $('#board-header a').last().after("<a id='burndownLink' class='quiet ed board-header-btn dark-hover' href='#'><span class='icon-sm'><img src='"+flameUrl+"' width='12' height='12'/></span><span class='text'>Burndown Chart</span></a>");
+        $('#burndownLink').click(showBurndown);
+    }
+}
+
+var ignoreClicks = function(){ return false; };
+function showBurndown()
+{
+    $('body').addClass("window-up");
+    $('.window').css("display", "block").css("top", "50px");
+
+	// Figure out the current user and board.
+	$memberObj = $('.header-user .member-avatar');
+	if($memberObj.length == 0){
+		$memberObj = $('.header-user .member-initials'); // if the user doesn't have an icon
+	}
+	var username = $memberObj.attr('title').match(/\((.*?)\)$/)[1];
+
+	// Some cards have the board-id in them.
+	var boardId = "";
+	$('.action-card').each(function(i, el){
+		var matches = $(el).attr('href').match(/\/([0-9a-f]{24})/);
+		if(matches){
+			boardId = matches[1];
+		}
+	});
+	var shortLink = document.location.href.match(/b\/([A-Za-z0-9]{8})\//)[1];
+	var boardName = "";
+	if(boardId == ""){ // if there was no boardId found, then pass in the board-name which will be used as a fallback.
+		boardName = $('.board-name span.text').text().trim();
+	}
+
+	// Build the dialog DOM elements. There are no unescaped user-provided strings being used here.
+	var clearfix = $('<div/>', {class: 'clearfix'});
+	var windowHeaderUtils = $('<div/>', {class: 'window-header-utils'}).append( $('<a/>', {class: 'icon-lg icon-close dark-hover js-close-window', href: '#', title:'Close this dialog window.'}) );
+	var iFrameWrapper = $('<div/>', {style: 'padding:10px; padding-top: 13px;'});
+    var flameIcon = $('<img/>', {style: 'position:absolute; margin-left: 20px; margin-top:15px;', src:flame18Url});
+    
+	var actualIFrame = $('<iframe/>', {frameborder: '0',
+						 style: 'width: 670px; height: 512px;',
+						 id: 'burndownFrame',
+						 src: "http://www.burndownfortrello.com/s4t_burndownPopup.php?boardId="+encodeURIComponent(boardId)+"&username="+encodeURIComponent(username)+"&shortLink="+encodeURIComponent(shortLink)+"&boardName="+encodeURIComponent(boardName)
+						});
+	var loadingFrameIndicator = $('<span/>', {class: 'js-spinner', id: 'loadingBurndownFrame', style: 'position: absolute; left: 225px; top: 260px;'}).append($('<span/>', {class: 'spinner left', style: 'margin-right:4px;'})).append("Loading 'Burndown for Trello'...");
+	iFrameWrapper.append(loadingFrameIndicator); // this will show that the iframe is loading... until it loads.
+	iFrameWrapper.append(actualIFrame);
+    actualIFrame.css("visibility", "hidden");
+	$windowWrapper = $('.window-wrapper');
+    $windowWrapper.click(ignoreClicks);
+	$windowWrapper.empty().append(clearfix).append(flameIcon).append(windowHeaderUtils).append(iFrameWrapper);
+	$('#burndownFrame').load(function(){ $('#loadingBurndownFrame').remove(); actualIFrame.css("visibility", "visible"); }); // once the iframe loads, get rid of the loading indicator.
+   $('.window-header-utils a.js-close-window').click(hideBurndown);
+    $(window).bind('resize', repositionBurndown);
+    $('.window-overlay').bind('click', hideBurndown);
+    
+    repositionBurndown();
+}
+
+function hideBurndown()
+{
+    $('body').removeClass("window-up");
+    $('.window').css("display", "none");
+    $(window).unbind('resize', repositionBurndown);
+	$('.window-header-utils a.js-close-window').unbind('click', hideBurndown);
+	$('.window-wrapper').unbind('click', ignoreClicks);
+    $('.window-overlay').unbind('click', hideBurndown);
+}
+
+function repositionBurndown()
+{
+    windowWidth = $(window).width();
+    if(windowWidth < 0) // todo change this to a n actual number (probably 710 or so)
+    {
+        // todo shrink our iframe to an appropriate size.  contents should wrap
+    }
+    else
+    {
+        burndownWindowWidth = 690;
+        leftPadding = (windowWidth - burndownWindowWidth) / 2.0;
+        $('.window').css("left", leftPadding);
+    }
+}
 
 //calculate board totals
 var ctto;
@@ -65,7 +212,7 @@ function computeTotal(){
 		var $title = $('#board-header');
 		var $total = $title.children('.list-total').empty();
 		if ($total.length == 0)
-			$total = $('<span class="list-total">').appendTo($title);
+			$total = $('<span/>', {class: "list-total"}).appendTo($title);
 
 		for (var i in _pointsAttr){
 			var score = 0,
@@ -73,8 +220,11 @@ function computeTotal(){
 			$('#board .list-total .'+attr).each(function(){
 				score+=parseFloat(this.textContent)||0;
 			});
-			$total.append('<span class="'+attr+'">'+(round(score)||'')+'</span>');
+			var scoreSpan = $('<span/>', {class: attr}).text(round(score)||'');
+			$total.append(scoreSpan);
 		}
+        
+        updateBurndownLink(); // the burndown link and the total are on the same bar... so now they'll be in sync as to whether they're both there or not.
 	});
 };
 
@@ -120,13 +270,34 @@ function List(el){
 					if(!isNaN(Number(this.listCard[attr].points)))score+=Number(this.listCard[attr].points)
 				});
 				var scoreTruncated = round(score);
-				$total.append('<span class="'+attr+'">'+(scoreTruncated>0?scoreTruncated:'')+'</span>');
+				var scoreSpan = $('<span/>', {class: attr}).text( (scoreTruncated>0) ? scoreTruncated : '' );
+				$total.append(scoreSpan);
 				computeTotal();
 			}
 		});
 	};
+    
+    this.refreshList = debounce(function(){
+    		readCard($list.find('.list-card:not(.placeholder)'));        
+            this.calc();
+    }, 500, false);
 
-	$list.on('DOMNodeRemoved',this.calc).on('DOMNodeInserted',readCard);
+	var cardAddedRemovedObserver = new MutationObserver(function(mutations)
+	{
+        $list = $(mutations[0].target).closest(".list");
+        list = $list.get(0).list;
+        
+        if(!list)
+        {
+            list = new List(mutations[0].target);
+        }
+        if(list)
+        {
+            list.refreshList();
+        }
+	});
+	
+    cardAddedRemovedObserver.observe($list.get(0), obsConfig);
 
 	setTimeout(function(){
 		readCard($list.find('.list-card'));
@@ -195,10 +366,10 @@ function ListCard(el, identifier){
 };
 
 //the story point picker
-function showPointPicker() {
-	if($(this).find('.picker').length) return;
-	var $picker = $('<div class="picker">').appendTo('.card-detail-title .edit-controls');
-	for (var i in _pointSeq) $picker.append($('<span class="point-value">').text(_pointSeq[i]).click(function(){
+function showPointPicker(location) {
+	if($(location).find('.picker').length) return;
+	var $picker = $('<div/>', {class: "picker"}).appendTo('.card-detail-title .edit-controls');
+	for (var i in _pointSeq) $picker.append($('<span>', {class: "point-value"}).text(_pointSeq[i]).click(function(){
 		var value = $(this).text();
 		var $text = $('.card-detail-title .edit textarea');
 		var text = $text.val();
@@ -278,4 +449,3 @@ function showExcelExport() {
 
 	return false
 };
-
