@@ -55,7 +55,6 @@ document.body.addEventListener('DOMNodeInserted',function(e){
 	else if($(e.target).hasClass('list')) calcListPoints();
 });
 
-
 //calculate board totals
 var ctto;
 function computeTotal(){
@@ -101,7 +100,10 @@ function List(el){
 		to2;
 
 	function readCard($c){
-		if($c.target) $c = $($c.target).filter('.list-card:not(.placeholder)');
+		if($c.target) {
+			if(!/list-card/.match(c.target.className)) return;
+			$c = $($c.target).filter('.list-card:not(.placeholder)');
+		}
 		$c.each(function(){
 			if(!this.listCard) for (var i in _pointsAttr)
 				new ListCard(this,_pointsAttr[i]);
@@ -153,22 +155,22 @@ function ListCard(el, identifier){
 		parsed,
 		that=this,
 		busy=false,
-		to,
-		to2,
-		phref='',
+		ptitle='',
 		$card=$(el),
 		$badge=$('<div class="badge badge-points point-count" style="background-image: url('+iconUrl+')"/>');
 
+	var ptitle = '';
 	this.refresh=function(){
+		if(busy) return;
+		busy = true;
 		clearTimeout(to);
 		to = setTimeout(function(){
 			var $title=$card.find('a.list-card-title');
 			if(!$title[0])return;
 			var title=$title[0].childNodes[1].textContent;
-			var href = $title.attr('href');
 			if(title) el._title = title;
-			if(href!=phref) {
-				phref = href;
+			if(title!=ptitle) {
+				ptitle = title;
 				parsed=title.match(regexp);
 				points=parsed?parsed[2]:-1;
 			}
@@ -186,12 +188,18 @@ function ListCard(el, identifier){
 					var list = $card.closest('.list');
 					if(list[0]) list[0].list.calc();
 				}
+				busy = false;
 			})
 		});
 	};
 
 	this.__defineGetter__('points',function(){
 		return parsed?points:''
+	});
+
+	if(!consumed) el.addEventListener('DOMNodeInserted',function(e){
+		if(/card-short-id/.test(e.target.className) && !busy)
+			that.refresh();
 	});
 
 	setTimeout(that.refresh);
