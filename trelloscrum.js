@@ -35,11 +35,8 @@ function round(_val) {return (Math.floor(_val * 100) / 100)};
 //what to do when DOM loads
 $(function(){
 	//watch filtering
-	function updateFilters() {
-		setTimeout(calcListPoints);
-	};
-	$('.js-toggle-label-filter, .js-select-member, .js-due-filter, .js-clear-all').live('mouseup', updateFilters);
-	$('.js-input').live('keyup', updateFilters);
+	$('.js-toggle-label-filter, .js-select-member, .js-due-filter, .js-clear-all').live('mouseup', calcListPoints);
+	$('.js-input').live('keyup', calcListPoints);
 
 	//for storypoint picker
 	$(".card-detail-title .edit-controls").live('DOMNodeInserted',showPointPicker);
@@ -55,7 +52,9 @@ $(function(){
 document.body.addEventListener('DOMNodeInserted',function(e){
 	if(e.target.id=='board') setTimeout(calcListPoints);
 	else if($(e.target).hasClass('board-name')) computeTotal();
+	else if($(e.target).hasClass('list')) calcListPoints();
 });
+
 
 //calculate board totals
 var ctto;
@@ -79,11 +78,15 @@ function computeTotal(){
 };
 
 //calculate list totals
-function calcListPoints($el){
-	($el||$('.list')).each(function(){
-		if(!this.list) new List(this);
-		else if(this.list.calc) this.list.calc();
-	})
+var lto;
+function calcListPoints(){
+	clearTimeout(lto);
+	lto = setTimeout(function(){
+		$('.list').each(function(){
+			if(!this.list) new List(this);
+			else if(this.list.calc) this.list.calc();
+		});
+	});
 };
 
 //.list pseudo
