@@ -101,7 +101,7 @@ function List(el){
 
 	function readCard($c){
 		if($c.target) {
-			if(!/list-card/.match(c.target.className)) return;
+			if(!/list-card/.test($c.target.className)) return;
 			$c = $($c.target).filter('.list-card:not(.placeholder)');
 		}
 		$c.each(function(){
@@ -157,9 +157,10 @@ function ListCard(el, identifier){
 		busy=false,
 		ptitle='',
 		$card=$(el),
-		$badge=$('<div class="badge badge-points point-count" style="background-image: url('+iconUrl+')"/>');
+		$badge=$('<div class="badge badge-points point-count" style="background-image: url('+iconUrl+')"/>'),
+		to,
+		to2;
 
-	var ptitle = '';
 	this.refresh=function(){
 		if(busy) return;
 		busy = true;
