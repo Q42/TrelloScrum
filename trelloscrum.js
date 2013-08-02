@@ -267,7 +267,7 @@ function showExcelExport() {
 
 		var blob = new Blob([s],{type:'application/ms-excel'});
 
-		var board_title_reg = /.*\/board\/(.*)\//;
+		var board_title_reg =  /.*\/(.*)$/;
 		var board_title_parsed = document.location.href.match(board_title_reg);
 		var board_title = board_title_parsed[1];
 
