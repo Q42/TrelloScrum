@@ -46,13 +46,14 @@ $(function(){
 	});
 
 	calcListPoints();
-
+	calcNonListPoints();
 });
 
 document.body.addEventListener('DOMNodeInserted',function(e){
 	if(e.target.id=='board') setTimeout(calcListPoints);
 	else if($(e.target).hasClass('board-name')) computeTotal();
 	else if($(e.target).hasClass('list')) calcListPoints();
+	else if($(e.target).is('.list-card:not(.list .list-card)')) calcNonListPoints($(e.target));
 });
 
 //calculate board totals
@@ -86,6 +87,23 @@ function calcListPoints(){
 			else if(this.list.calc) this.list.calc();
 		});
 	});
+};
+
+var nlto;
+function calcNonListPoints(card){
+	if (card) {
+		if(!card.listCard) for (var i in _pointsAttr)
+			new ListCard(card,_pointsAttr[i]);
+		else for (var i in _pointsAttr)
+			setTimeout(card.listCard[_pointsAttr[i]].refresh);
+	} else {
+		clearTimeout(nlto);
+		nlto = setTimeout(function(){
+			$('.list-card:not(.list .list-card):not(.placeholder):visible').each(function(){
+				calcNonListPoints(this);
+			});
+		});
+	}
 };
 
 //.list pseudo
