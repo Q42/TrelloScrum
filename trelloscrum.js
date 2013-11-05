@@ -197,7 +197,7 @@ function showBurndown()
 	var actualIFrame = $('<iframe/>', {frameborder: '0',
 						 style: 'width: 670px; height: 512px;',
 						 id: 'burndownFrame',
-						 src: "http://www.burndownfortrello.com/s4t_burndownPopup.php?boardId="+encodeURIComponent(boardId)+"&username="+encodeURIComponent(username)+"&shortLink="+encodeURIComponent(shortLink)+"&boardName="+encodeURIComponent(boardName)
+						 src: "https://www.burndownfortrello.com/s4t_burndownPopup.php?boardId="+encodeURIComponent(boardId)+"&username="+encodeURIComponent(username)+"&shortLink="+encodeURIComponent(shortLink)+"&boardName="+encodeURIComponent(boardName)
 						});
 	var loadingFrameIndicator = $('<span/>', {class: 'js-spinner', id: 'loadingBurndownFrame', style: 'position: absolute; left: 225px; top: 260px;'}).append($('<span/>', {class: 'spinner left', style: 'margin-right:4px;'})).append("Loading 'Burndown for Trello'...");
 	iFrameWrapper.append(loadingFrameIndicator); // this will show that the iframe is loading... until it loads.
