@@ -59,6 +59,12 @@ if(typeof chrome !== 'undefined'){
 	pointsDoneUrl = chrome.extension.getURL('images/points-done.png');
     flameUrl = chrome.extension.getURL('images/burndown_for_trello_icon_12x12.png');
     flame18Url = chrome.extension.getURL('images/burndown_for_trello_icon_18x18.png');
+} else if(navigator.userAgent.indexOf('Safari') != -1){ // Chrome defines both "Chrome" and "Safari", so this test MUST be done after testing for Chrome
+	// Works in Safari
+	iconUrl = safari.extension.baseURI + 'images/storypoints-icon.png';
+	pointsDoneUrl = safari.extension.baseURI + 'images/points-done.png';
+    flameUrl = safari.extension.baseURI + 'images/burndown_for_trello_icon_12x12.png';
+    flame18Url = safari.extension.baseURI + 'images/burndown_for_trello_icon_18x18.png';
 } else {
 	// Works in Firefox Add-On
 	if(typeof self.options != 'undefined'){ // options defined in main.js
@@ -78,6 +84,16 @@ function round(_val) {return (Math.floor(_val * 100) / 100)};
 //		$($('.header-btn-text').get(0)).text(msg);
 //	}
 //}
+
+// Some browsers have serious errors with MutationObserver (eg: Safari doesn't have it called MutationObserver).
+var CrossBrowser = {
+	init: function(){
+		this.MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver || null;
+	}
+};
+CrossBrowser.init();
+
+
 
 //what to do when DOM loads
 $(function(){
@@ -104,7 +120,7 @@ var recalcListAndTotal = debounce(function($el){
 	})
 }, 500, false);
 
-var recalcTotalsObserver = new MutationObserver(function(mutations)
+var recalcTotalsObserver = new CrossBrowser.MutationObserver(function(mutations)
 {	
 	// Determine if the mutation event included an ACTUAL change to the list rather than
 	// a modification caused by this extension making an update to points, etc. (prevents
@@ -174,19 +190,10 @@ function showBurndown()
 	}
 	var username = $memberObj.attr('title').match(/\((.*?)\)$/)[1];
 
-	// Some cards have the board-id in them.
-	var boardId = "";
-	$('.action-card').each(function(i, el){
-		var matches = $(el).attr('href').match(/\/([0-9a-f]{24})/);
-		if(matches){
-			boardId = matches[1];
-		}
-	});
+	// Find the short-link board name, etc. so that the back-end can figure out what board this is.
 	var shortLink = document.location.href.match(/b\/([A-Za-z0-9]{8})\//)[1];
 	var boardName = "";
-	if(boardId == ""){ // if there was no boardId found, then pass in the board-name which will be used as a fallback.
-		boardName = $('.board-name span.text').text().trim();
-	}
+	boardName = $('.board-name span.text').text().trim();
 
 	// Build the dialog DOM elements. There are no unescaped user-provided strings being used here.
 	var clearfix = $('<div/>', {class: 'clearfix'});
@@ -197,7 +204,7 @@ function showBurndown()
 	var actualIFrame = $('<iframe/>', {frameborder: '0',
 						 style: 'width: 670px; height: 512px;',
 						 id: 'burndownFrame',
-						 src: "https://www.burndownfortrello.com/s4t_burndownPopup.php?boardId="+encodeURIComponent(boardId)+"&username="+encodeURIComponent(username)+"&shortLink="+encodeURIComponent(shortLink)+"&boardName="+encodeURIComponent(boardName)
+						 src: "https://www.burndownfortrello.com/s4t_burndownPopup.php?username="+encodeURIComponent(username)+"&shortLink="+encodeURIComponent(shortLink)+"&boardName="+encodeURIComponent(boardName)
 						});
 	var loadingFrameIndicator = $('<span/>', {class: 'js-spinner', id: 'loadingBurndownFrame', style: 'position: absolute; left: 225px; top: 260px;'}).append($('<span/>', {class: 'spinner left', style: 'margin-right:4px;'})).append("Loading 'Burndown for Trello'...");
 	iFrameWrapper.append(loadingFrameIndicator); // this will show that the iframe is loading... until it loads.
@@ -334,7 +341,7 @@ function List(el){
             this.calc(); // readCard will call this.calc() if any of the cards get refreshed.
     }, 500, false);
 
-	var cardAddedRemovedObserver = new MutationObserver(function(mutations)
+	var cardAddedRemovedObserver = new CrossBrowser.MutationObserver(function(mutations)
 	{
 		// Determine if the mutation event included an ACTUAL change to the list rather than
 		// a modification caused by this extension making an update to points, etc. (prevents
@@ -454,7 +461,7 @@ function ListCard(el, identifier){
 		return parsed?points:''
 	});
 
-	var cardShortIdObserver = new MutationObserver(function(mutations){
+	var cardShortIdObserver = new CrossBrowser.MutationObserver(function(mutations){
 		$.each(mutations, function(index, mutation){
 			var $target = $(mutation.target);
 			if(mutation.addedNodes.length > 0){
