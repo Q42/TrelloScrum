@@ -1,6 +1,6 @@
 {
 	"name": "Scrum for Trello",
-	"version": "1.52",
+	"version": "1.61",
 	"description": "Adds Scrum to your Trello",
 	"content_scripts": [
 		{
@@ -15,6 +15,8 @@
 	    "images/storypoints-icon.png",
 	    "images/points-done.png",
 		"images/burndown_for_trello_icon_12x12.png",
-		"images/burndown_for_trello_icon_18x18.png"
+		"images/burndown_for_trello_icon_18x18.png",
+		"images/trello-scrum-icon_12x12.png",
+		"images/trello-scrum-icon_18x18.png"
     ]
 }
