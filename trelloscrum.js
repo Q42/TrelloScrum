@@ -42,11 +42,20 @@ var debounce = function (func, threshold, execAsap) {
 // For MutationObserver
 var obsConfig = { childList: true, characterData: true, attributes: false, subtree: true };
 
-//default story point picker sequence
+//default story point picker sequence (can be overridden in the Scrum for Trello 'Settings' popup)
 var _pointSeq = ['?', 0, .5, 1, 2, 3, 5, 8, 13, 21];
 //attributes representing points values for card
 var _pointsAttr = ['cpoints', 'points'];
 
+// All settings and their defaults.
+var S4T_SETTINGS = [];
+var SETTING_NAME_LINK_STYLE = "burndownLinkStyle";
+var SETTING_NAME_ESTIMATES = "estimatesSequence";
+var S4T_ALL_SETTINGS = [SETTING_NAME_LINK_STYLE, SETTING_NAME_ESTIMATES];
+var S4T_SETTING_DEFAULTS = {};
+S4T_SETTING_DEFAULTS[SETTING_NAME_LINK_STYLE] = 'full';
+S4T_SETTING_DEFAULTS[SETTING_NAME_ESTIMATES] = _pointSeq.join();
+refreshSettings(); // get the settings right away (may take a little bit if using Chrome cloud storage)
 
 //internals
 var reg = /((?:^|\s))\((\x3f|\d*\.?\d+)(\))\s?/m, //parse regexp- accepts digits, decimals and '?', surrounded by ()
@@ -177,18 +186,25 @@ recalcTotalsObserver.observe(document.body, obsConfig);
 // Refreshes the link to the Burndown Chart dialog.
 function updateBurndownLink(){
     // Add the link for Burndown Charts
-    //$('#burndownLink').remove();
-    if($('#burndownLink').length === 0){
+    //$('.s4tLink').remove();
+    if($('.s4tLink').length === 0){
+		var buttons = "";
+
 		// Link for Burndown Charts
-		var buttons = "<a id='burndownLink' class='quiet ed board-header-btn dark-hover' href='#'>";
-		buttons += "<span class='icon-sm'><img src='"+flameUrl+"' width='12' height='12'/></span>";
-		buttons += "<span class='text'>Burndown Chart</span>";
-		buttons += "</a>";
+		var linkSetting = S4T_SETTINGS[SETTING_NAME_LINK_STYLE];
+		if(linkSetting !== 'none'){
+			buttons += "<a id='burndownLink' class='s4tLink quiet ed board-header-btn dark-hover' href='#'>";
+			buttons += "<span class='icon-sm'><img src='"+flameUrl+"' width='12' height='12'/></span>";
+			if(linkSetting !== 'icon'){
+				buttons += "<span class='text'>Burndown Chart</span>";
+			}
+			buttons += "</a>";
+		}
 		// Link for settings
-		//buttons += "<a id='scrumSettingsLink' class='quiet ed board-header-btn dark-hover' href='#'>";
-		//buttons += "<span class='icon-sm'><img src='"+scrumLogoUrl+"' width='12' height='12' title='Settings: Scrum for Trello'/></span>";
-		////buttons += "<span class='text'>Settings</span>"; // too big :-/ icon only for now
-		//buttons += "</a>";
+		buttons += "<a id='scrumSettingsLink' class='s4tLink quiet ed board-header-btn dark-hover' href='#'>";
+		buttons += "<span class='icon-sm'><img src='"+scrumLogoUrl+"' width='12' height='12' title='Settings: Scrum for Trello'/></span>";
+		//buttons += "<span class='text'>Settings</span>"; // too big :-/ icon only for now
+		buttons += "</a>";
 		var showOnLeft = true;
 		if(showOnLeft){
 			$('.board-header-btns.left').last().after(buttons);
@@ -246,6 +262,7 @@ function showBurndown()
 
 function showSettings()
 {
+	var settingsFrameId = 'settingsFrame';
     $('body').addClass("window-up");
     $('.window').css("display", "block").css("top", "50px");
 
@@ -255,56 +272,120 @@ function showSettings()
     var settingsIcon = $('<img/>', {style: 'position:absolute; margin-left: 20px; margin-top:15px;', src:scrumLogo18Url});
 
 	// Create the Settings form.
-	var settingsDiv = $('<div/>', {style: "padding:0px 10px;font-family:'Helvetica Neue', Arial, Helvetica, sans-serif;"});
-	var iframeHeader = $('<h3/>', {style: 'text-align: center;'});
-	iframeHeader.text('Scrum for Trello');
-	var settingsHeader = $('<h3/>', {style: 'text-align: center;'});
-	settingsHeader.text('Settings');
-	var settingsForm = $('<form/>', {id: 'scrumForTrelloForm'});
+	{
+		// Load the current settings (with defaults in case Settings haven't been set).
+		var setting_link = S4T_SETTINGS[SETTING_NAME_LINK_STYLE];
+		var setting_estimateSeq = S4T_SETTINGS[SETTING_NAME_ESTIMATES];
 	
-	var fieldset_burndownLink = $('<fieldset/>');
-	var legend_burndownLink = $('<legend/>');
-	legend_burndownLink.text("Burndown Chart link");
-	fieldset_burndownLink.append(legend_burndownLink);
-		var burndownRadio_full = $('<input/>', {type: 'radio', name: 'burndownLinkSetting', id: 'link_full', value: 'full'});
-		var label_full = $('<label/>', {for: 'link_full'});
-		label_full.text('Enable "Burndown Chart" link (recommended)');
-		fieldset_burndownLink.append(burndownRadio_full).append(label_full);
+		var settingsDiv = $('<div/>', {style: "padding:0px 10px;font-family:'Helvetica Neue', Arial, Helvetica, sans-serif;"});
+		var iframeHeader = $('<h3/>', {style: 'text-align: center;'});
+		iframeHeader.text('Scrum for Trello');
+		var settingsHeader = $('<h3/>', {style: 'text-align: center;margin-bottom:0px'});
+		settingsHeader.text('Settings');
+		var settingsInstructions = $('<div/>', {style: 'margin-bottom:10px'}).html('These settings affect how Scrum for Trello appears to <em>you</em> on all boards.  When you&apos;re done, remember to click "Save Settings" below.');
+		var settingsForm = $('<form/>', {id: 'scrumForTrelloForm'});
+		
+		// How the 'Burndown Chart' link should appear (if at all).
+		var fieldset_burndownLink = $('<fieldset/>');
+		var legend_burndownLink = $('<legend/>');
+		legend_burndownLink.text("Burndown Chart link");
+		var burndownLinkSetting_radioName = 'burndownLinkSetting';
+		fieldset_burndownLink.append(legend_burndownLink);
+			var burndownRadio_full = $('<input/>', {type: 'radio', name: burndownLinkSetting_radioName, id: 'link_full', value: 'full'});
+			if(setting_link == 'full'){
+				burndownRadio_full.prop('checked', true);
+			}
+			var label_full = $('<label/>', {for: 'link_full'});
+			label_full.text('Enable "Burndown Chart" link (recommended)');
+			fieldset_burndownLink.append(burndownRadio_full).append(label_full).append("<br/>");
 
-		var burndownRadio_icon = $('<input/>', {type: 'radio', name: 'burndownLinkSetting', id: 'link_icon', value: 'icon'});
-		var label_icon = $('<label/>', {for: 'link_icon'});
-		label_icon.text('Icon only');
-		fieldset_burndownLink.append(burndownRadio_icon).append(label_icon);
+			var burndownRadio_icon = $('<input/>', {type: 'radio', name: burndownLinkSetting_radioName, id: 'link_icon', value: 'icon'});
+			if(setting_link == 'icon'){
+				burndownRadio_icon.prop('checked', true);
+			}
+			var label_icon = $('<label/>', {for: 'link_icon'});
+			label_icon.text('Icon only');
+			fieldset_burndownLink.append(burndownRadio_icon).append(label_icon).append("<br/>");
 
-		var burndownRadio_none = $('<input/>', {type: 'radio', name: 'burndownLinkSetting', id: 'link_none', value: 'none'});
-		var label_none = $('<label/>', {for: 'link_none'});
-		label_none.text('Disable completely');
-		fieldset_burndownLink.append(burndownRadio_none).append(label_none);
-	settingsForm.append(fieldset_burndownLink);
+			var burndownRadio_none = $('<input/>', {type: 'radio', name: burndownLinkSetting_radioName, id: 'link_none', value: 'none'});
+			if(setting_link == 'none'){
+				burndownRadio_none.prop('checked', true);
+			}
+			var label_none = $('<label/>', {for: 'link_none'});
+			label_none.text('Disable completely');
+			fieldset_burndownLink.append(burndownRadio_none).append(label_none).append("<br/>");
+		
+		// Which estimate buttons should show up.
+		var fieldset_estimateButtons = $('<fieldset/>', {style: 'margin-top:5px'});
+		var legend_estimateButtons = $('<legend/>');
+		legend_estimateButtons.text("Estimate Buttons");
+		fieldset_estimateButtons.append(legend_estimateButtons);
+			var explanation = $('<div/>').text("List out the values you want to appear on the estimate buttons, separated by commas. They can be whole numbers, decimals, or a question mark.");
+			fieldset_estimateButtons.append(explanation);
+			
+			var estimateFieldId = 'pointSequenceToUse';
+			var estimateField = $('<input/>', {id: estimateFieldId, size: 40, val: setting_estimateSeq});
+			fieldset_estimateButtons.append(estimateField);
+			
+			var titleTextStr = "Original sequence is: " + _pointSeq.join();
+			var restoreDefaultsButton = $('<button/>')
+											.text('restore to original values')
+											.attr('title', titleTextStr)
+											.click(function(e){
+												e.preventDefault();
+												$('#'+settingsFrameId).contents().find('#'+estimateFieldId).val(_pointSeq.join());
+											});
+			fieldset_estimateButtons.append(restoreDefaultsButton);
+
+		var saveButton = $('<button/>', {style:'margin-top:5px'}).text('Save Settings').click(function(e){
+			e.preventDefault();
+
+			// Save the settings (persists them using Chrome cloud, LocalStorage, or Cookies - in that order of preference if available).
+			S4T_SETTINGS[SETTING_NAME_LINK_STYLE] = $('iframe').contents().find('input:radio[name='+burndownLinkSetting_radioName+']:checked').val();
+			S4T_SETTINGS[SETTING_NAME_ESTIMATES] = $('iframe').contents().find('#'+estimateFieldId).val();
+			
+			// Persist all settings.
+			$.each(S4T_ALL_SETTINGS, function(i, settingName){
+				saveSetting(settingName, S4T_SETTINGS[settingName]);
+			});
+
+			// Allow the UI to update itself as needed.
+			onSettingsUpdated();
+		});
+		var savedIndicator = $('<span/>', {id: 's4tSaved', style: 'color:#080;background-color:#afa;font-weight:bold;display:none;margin-left:10px'})
+									.text("Saved!");
+
+		// Set up the form (all added down here to be easier to change the order).
+		settingsForm.append(fieldset_burndownLink);
+		settingsForm.append(fieldset_estimateButtons);
+		settingsForm.append(saveButton);
+		settingsForm.append(savedIndicator);
+	}
 	
 	// Quick start instructions.
 	var quickStartDiv = $('<div>\
-		<h4>Getting started</h4>\
-		<ol>\
+		<h4 style="margin-top:0px;margin-bottom:0px">Getting started</h4>\
+		<ol style="margin-top:0px">\
 			<li>To add an estimate to a card, first <strong>click a card</strong> to open it</li>\
 			<li><strong>Click the title of the card</strong> to "edit" the title.</li>\
 			<li>Once the Card title is in edit-mode, blue number buttons will appear. <strong>Click one of the buttons</strong> to set that as the estimate.</li>\
 		</ol>\
 	</div>');
 
-	var moreInfoLink = $('<span>For more information, see <a href="http://scrumfortrello.com">ScrumForTrello.com</a></span>');
+	var moreInfoLink = $('<small>For more information, see <a href="http://scrumfortrello.com">ScrumForTrello.com</a></small>');
 
 	// Add each of the components to build the iframe (all done here to make it easier to re-order them).
 	settingsDiv.append(iframeHeader);
 	settingsDiv.append(quickStartDiv);
 	settingsDiv.append(settingsHeader);
+	settingsDiv.append(settingsInstructions);
 	settingsDiv.append(settingsForm);
 	settingsDiv.append(moreInfoLink);
 
 	// Trello swallows normal input, so things like checkboxes and radio buttons don't work right... so we stuff everything in an iframe.
 	var iframeObj = $('<iframe/>', {frameborder: '0',
 						 style: 'width: 670px; height: 512px;',
-						 id: 'settingsFrame'
+						 id: settingsFrameId
 	});
 	$windowWrapper = $('.window-wrapper');
     $windowWrapper.click(ignoreClicks);
@@ -600,7 +681,9 @@ function ListCard(el, identifier){
 function showPointPicker(location) {
 	if($(location).find('.picker').length) return;
 	var $picker = $('<div/>', {class: "picker"}).appendTo('.card-detail-title .edit-controls');
-	for (var i in _pointSeq) $picker.append($('<span>', {class: "point-value"}).text(_pointSeq[i]).click(function(){
+	
+	var estimateSequence = (getSetting(SETTING_NAME_ESTIMATES, _pointSeq.join())).split(',');	
+	for (var i in estimateSequence) $picker.append($('<span>', {class: "point-value"}).text(estimateSequence[i]).click(function(){
 		var value = $(this).text();
 		var $text = $('.card-detail-title .edit textarea');
 		var text = $text.val();
@@ -680,3 +763,127 @@ function showExcelExport() {
 
 	return false
 };
+
+// for settings
+
+function useChromeStorage(){
+	return ((typeof chrome !== "undefined") && (typeof chrome.storage !== "undefined"));
+}
+
+/**
+ * Saves the Setting (defined by 'settingName') to be whatever is in 'settingValue'.
+ *
+ * This will use Chrome cloud-storage if available, then will fall back to LocalStorage
+ * if possible and fall back to cookies otherwise.
+ *
+ * NOTE: Remember to enver store confidential or user information in Chrome cloud
+ * storage (it's not encrypted).
+ */
+function saveSetting(settingName, settingValue){
+	// Use Chrome cloud storage where available (will sync across multiple computers).
+	if(useChromeStorage()){
+		var objectToPersist = {}; // can't use an object-literal to do it, or chrome will make an object whose key is literally 'settingName'
+		objectToPersist[settingName] = settingValue;
+		chrome.storage.sync.set(objectToPersist, function() {
+			// console.log("Chrome saved " + settingName + ".");
+		});
+	} else if(typeof(Storage) !== "undefined"){
+		localStorage[settingName] = settingValue;
+	} else {
+		// No LocalStorage support... use cookies instead.
+		setCookie(settingName, settingValue);
+	}
+} // end saveSetting()
+
+/**
+ * Retrieves the Setting defined by 'settingName'. The 'defaultValue' is optional.
+ *
+ * This will use Chrome cloud-storage if available, then will fall back to LocalStorage
+ * if possible and fall back to cookies otherwise.
+ */
+function getSetting(settingName, defaultValue){
+	var retVal = defaultValue;
+	if(typeof(Storage) !== "undefined"){
+		var lsValue = localStorage[settingName];
+		if(typeof lsValue !== 'undefined'){
+			retVal = lsValue;
+		}
+	} else {
+		// No LocalStorage support... use cookies instead.
+		retVal = getCookie(settingName, defaultValue);
+	}
+	return retVal;
+}; // end getSetting()
+
+/**
+ * Refreshes all of the persisted settings and puts them in memory. This is
+ * done at the beginning, and any time chrome cloud-storage sends an event
+ * that the data has changed.
+ */
+function refreshSettings(){
+	if(useChromeStorage()){
+		chrome.storage.sync.get(S4T_ALL_SETTINGS, function(result){
+			//if(chrome.runtime.lastError){}
+			$.each(S4T_ALL_SETTINGS, function(i, settingName){
+				if(result[settingName]){
+					S4T_SETTINGS[settingName] = result[settingName];
+				} else {
+					S4T_SETTINGS[settingName] = S4T_SETTING_DEFAULTS[settingName];
+				}
+			});
+			onSettingsUpdated();
+		});
+	} else {
+		// Get the settings (with defaults for each). Add a new line here for every new setting.
+		$.each(S4T_ALL_SETTINGS, function(i, settingName){
+			S4T_SETTINGS[settingName] = getSetting(settingName, S4T_SETTING_DEFAULTS[settingName]);
+		});
+		onSettingsUpdated();
+	}
+}; // end refreshSettings()
+
+function onSettingsUpdated(){
+	// Temporary indication to the user that the settings were saved (might not always be on screen, but that's not a problem).
+	$('iframe').contents().find('#s4tSaved').show().fadeOut(2000, "linear");
+	
+	// Refresh the links because link-settings may have changed.
+	$('.s4tLink').remove();
+	updateBurndownLink();
+} // end onSettingsUpdated()
+
+/**
+ * Sets a key/value cookie to live for about a year. Cookies are typically not used by
+ * this extension if LocalSettings is available in the browser.
+ * From: http://www.w3schools.com/js/js_cookies.asp
+ */
+function setCookie(c_name,value){
+	var exdays = 364;
+	var exdate=new Date();
+	exdate.setDate(exdate.getDate() + exdays);
+	var c_value=escape(value) + ((exdays==null) ? "" : "; expires="+exdate.toUTCString());
+	document.cookie=c_name + "=" + c_value;
+}; // end setCookie()
+
+/**
+ * Gets a cookie value if available (defaultValue if not found). Cookies are typically not\
+ * used by this extension if LocalSettings is available in the browser.
+ * Basically from: http://www.w3schools.com/js/js_cookies.asp
+ */
+function getCookie(c_name, defaultValue){
+	var c_value = document.cookie;
+	var c_start = c_value.indexOf(" " + c_name + "=");
+	if (c_start == -1){
+		c_start = c_value.indexOf(c_name + "=");
+	}
+	if (c_start == -1){
+		c_value = defaultValue;
+	} else {
+		c_start = c_value.indexOf("=", c_start) + 1;
+		var c_end = c_value.indexOf(";", c_start);
+		if (c_end == -1) {
+			c_end = c_value.length;
+		}
+		c_value = unescape(c_value.substring(c_start,c_end));
+	}
+	return c_value;
+}; // end getCookie()
