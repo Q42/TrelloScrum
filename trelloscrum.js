@@ -90,7 +90,7 @@ if(typeof chrome !== 'undefined'){
 		scrumLogo18Url = self.options.scrumLogo18Url;
 	}
 }
-function round(_val) {return (Math.floor(_val * 100) / 100)};
+function round(_val) {return (Math.round(_val * 100) / 100)};
 
 // Comment out before release - makes cross-browser debugging easier.
 //function log(msg){
