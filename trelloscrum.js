@@ -798,8 +798,8 @@ function saveSetting(settingName, settingValue){
 /**
  * Retrieves the Setting defined by 'settingName'. The 'defaultValue' is optional.
  *
- * This will use Chrome cloud-storage if available, then will fall back to LocalStorage
- * if possible and fall back to cookies otherwise.
+ * This will use LocalStorage if possible and fall back to cookies otherwise. Typically
+ * this function will only be used if Chrome cloud storage is not available.
  */
 function getSetting(settingName, defaultValue){
 	var retVal = defaultValue;
