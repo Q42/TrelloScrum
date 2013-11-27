@@ -681,7 +681,8 @@ function ListCard(el, identifier){
 function showPointPicker(location) {
 	if($(location).find('.picker').length) return;
 	var $picker = $('<div/>', {class: "picker"}).appendTo('.card-detail-title .edit-controls');
-	
+	$picker.append($('<span>', {class: "picker-title"}).text("Estimated Points"));
+
 	var estimateSequence = (S4T_SETTINGS[SETTING_NAME_ESTIMATES]).split(',');
 	for (var i in estimateSequence) $picker.append($('<span>', {class: "point-value"}).text(estimateSequence[i]).click(function(){
 		var value = $(this).text();
@@ -690,6 +691,24 @@ function showPointPicker(location) {
 
 		// replace our new
 		$text[0].value=text.match(reg)?text.replace(reg, '('+value+') '):'('+value+') ' + text;
+
+		// then click our button so it all gets saved away
+		$(".card-detail-title .edit .js-save-edit").click();
+
+		return false
+	}))
+	if($(location).find('.picker-consumed').length) return;
+	var $pickerConsumed = $('<div/>', {class: "picker-consumed"}).appendTo('.card-detail-title .edit-controls');
+	$pickerConsumed.append($('<span>', {class: "picker-title"}).text("Consumed Points"));
+
+	var consumedSequence = (S4T_SETTINGS[SETTING_NAME_ESTIMATES]).split(',');
+	for (var i in consumedSequence) $pickerConsumed.append($('<span>', {class: "point-value"}).text(consumedSequence[i]).click(function(){
+		var value = $(this).text();
+		var $text = $('.card-detail-title .edit textarea');
+		var text = $text.val();
+
+		// replace our new
+		$text[0].value=text.match(regC)?text.replace(regC, ' ['+value+']'):text + ' ['+value+']';
 
 		// then click our button so it all gets saved away
 		$(".card-detail-title .edit .js-save-edit").click();
