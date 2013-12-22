@@ -194,16 +194,16 @@ function updateBurndownLink(){
 		var linkSetting = S4T_SETTINGS[SETTING_NAME_LINK_STYLE];
 		if(linkSetting !== 'none'){
 			buttons += "<a id='burndownLink' class='s4tLink quiet ed board-header-btn dark-hover' href='#'>";
-			buttons += "<span class='icon-sm'><img src='"+flameUrl+"' width='12' height='12'/></span>";
+			buttons += "<span class='icon-sm board-header-btn-icon'><img src='"+flameUrl+"' width='12' height='12'/></span>";
 			if(linkSetting !== 'icon'){
-				buttons += "<span class='text'>Burndown Chart</span>";
+				buttons += "<span class='text board-header-btn-text'>Burndown Chart</span>";
 			}
 			buttons += "</a>";
 		}
 		// Link for settings
 		buttons += "<a id='scrumSettingsLink' class='s4tLink quiet ed board-header-btn dark-hover' href='#'>";
-		buttons += "<span class='icon-sm'><img src='"+scrumLogoUrl+"' width='12' height='12' title='Settings: Scrum for Trello'/></span>";
-		//buttons += "<span class='text'>Settings</span>"; // too big :-/ icon only for now
+		buttons += "<span class='icon-sm board-header-btn-icon'><img src='"+scrumLogoUrl+"' width='12' height='12' title='Settings: Scrum for Trello'/></span>";
+		//buttons += "<span class='text board-header-btn-text'>Settings</span>"; // too big :-/ icon only for now
 		buttons += "</a>";
 		var showOnLeft = true;
 		if(showOnLeft){
@@ -236,7 +236,7 @@ function showBurndown()
 
 	// Build the dialog DOM elements. There are no unescaped user-provided strings being used here.
 	var clearfix = $('<div/>', {class: 'clearfix'});
-	var windowHeaderUtils = $('<div/>', {class: 'window-header-utils'}).append( $('<a/>', {class: 'icon-lg icon-close dark-hover js-close-window', href: '#', title:'Close this dialog window.'}) );
+	var windowHeaderUtils = $('<div/>', {class: 'window-header-utils dialog-close-button'}).append( $('<a/>', {class: 'icon-lg icon-close dark-hover js-close-window', href: '#', title:'Close this dialog window.'}) );
 	var iFrameWrapper = $('<div/>', {style: 'padding:10px; padding-top: 13px;'});
     var flameIcon = $('<img/>', {style: 'position:absolute; margin-left: 20px; margin-top:15px;', src:flame18Url});
     
@@ -268,7 +268,7 @@ function showSettings()
 
 	// Build the dialog DOM elements. There are no unescaped user-provided strings being used here.
 	var clearfix = $('<div/>', {class: 'clearfix'});
-	var windowHeaderUtils = $('<div/>', {class: 'window-header-utils'}).append( $('<a/>', {class: 'icon-lg icon-close dark-hover js-close-window', href: '#', title:'Close this dialog window.'}) );
+	var windowHeaderUtils = $('<div/>', {class: 'window-header-utils dialog-close-button'}).append( $('<a/>', {class: 'icon-lg icon-close dark-hover js-close-window', href: '#', title:'Close this dialog window.'}) );
     var settingsIcon = $('<img/>', {style: 'position:absolute; margin-left: 20px; margin-top:15px;', src:scrumLogo18Url});
 
 	// Create the Settings form.
