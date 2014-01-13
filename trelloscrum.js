@@ -35,7 +35,7 @@ var debounce = function (func, threshold, execAsap) {
 		else if (execAsap)
 			func.apply(obj, args);
 
-		timeout = setTimeout(delayed, threshold || 100); 
+		timeout = setTimeout(delayed, threshold || 100);
 	};
 }
 
@@ -149,6 +149,7 @@ var recalcTotalsObserver = new CrossBrowser.MutationObserver(function(mutations)
 		// Ignore a bunch of known cases that send mutation events which don't require us to recalcListAndTotal.
 		if(! ($target.hasClass('list-total')
 			  || $target.hasClass('list-title')
+			  || $target.hasClass('list-header')
 			  || $target.hasClass('date') // the 'time-ago' functionality changes date spans every minute
 			  || $target.hasClass('js-phrase') // this is constantly updated by Trello, but doesn't affect estimates.
               || $target.hasClass('member')
@@ -209,7 +210,7 @@ function updateBurndownLink(){
 		if(showOnLeft){
 			$('.board-header-btns.left').last().after(buttons);
 		} else {
-			$('#board-header a').last().after(buttons);
+			$('.board-header-btns.right,#board-header a').last().after(buttons);
 		}
         $('#burndownLink').click(showBurndown);
 		$('#scrumSettingsLink').click(showSettings);
@@ -431,7 +432,7 @@ var ctto;
 function computeTotal(){
 	clearTimeout(ctto);
 	ctto = setTimeout(function(){
-		var $title = $('#board-header');
+		var $title = $('.board-header-btns.right,#board-header a');
 		var $total = $title.children('.list-total').empty();
 		if ($total.length == 0)
 			$total = $('<span/>', {class: "list-total"}).appendTo($title);
@@ -495,7 +496,7 @@ function List(el){
 		//if(e&&e.target&&!$(e.target).hasClass('list-card')) return; // TODO: REMOVE - What was this? We never pass a param into this function.
 		clearTimeout(to);
 		to = setTimeout(function(){
-			$total.empty().appendTo($list.find('.list-title'));
+			$total.empty().appendTo($list.find('.list-title,.list-header'));
 			for (var i in _pointsAttr){
 				var score=0,
 					attr = _pointsAttr[i];
@@ -532,6 +533,7 @@ function List(el){
 			// Ignore a bunch of known elements that send mutation events.
 			if(! ($target.hasClass('list-total')
 					|| $target.hasClass('list-title')
+					|| $target.hasClass('list-header')
 					|| $target.hasClass('badge-points')
 					|| $target.hasClass('badges')
 					|| (typeof mutation.target.className == "undefined")
