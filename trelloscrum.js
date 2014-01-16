@@ -344,7 +344,7 @@ function showSettings()
 			// Save the settings (persists them using Chrome cloud, LocalStorage, or Cookies - in that order of preference if available).
 			S4T_SETTINGS[SETTING_NAME_LINK_STYLE] = $('iframe').contents().find('input:radio[name='+burndownLinkSetting_radioName+']:checked').val();
 			S4T_SETTINGS[SETTING_NAME_ESTIMATES] = $('iframe').contents().find('#'+estimateFieldId).val();
-			
+
 			// Persist all settings.
 			$.each(S4T_ALL_SETTINGS, function(i, settingName){
 				saveSetting(settingName, S4T_SETTINGS[settingName]);
@@ -385,15 +385,21 @@ function showSettings()
 
 	// Trello swallows normal input, so things like checkboxes and radio buttons don't work right... so we stuff everything in an iframe.
 	var iframeObj = $('<iframe/>', {frameborder: '0',
-						 style: 'width: 670px; height: 512px;',
-						 id: settingsFrameId
+						 style: 'width: 670px; height: 528px;', /* 512 was fine on Chrome, but FF requires 528 to avoid scrollbars */
+						 id: settingsFrameId,
 	});
 	$windowWrapper = $('.window-wrapper');
     $windowWrapper.click(ignoreClicks);
 	$windowWrapper.empty().append(clearfix).append(settingsIcon).append(windowHeaderUtils);
-	
+
 	iframeObj.appendTo($windowWrapper);
-	iframeObj.contents().find('body').append(settingsDiv);
+
+	// Firefox wil load the iframe (even if there is no 'src') and overwrite the existing HTML, so we've
+	// reworked this to load about:blank then set our HTML upon load completion.
+	iframeObj.load(function(){
+		iframeObj.contents().find('body').append(settingsDiv);
+	});
+	iframeObj.attr('src', "about:blank"); // need to set this AFTER the .load() has been registered.
 	
 	$('.window-header-utils a.js-close-window').click(hideBurndown);
     $(window).bind('resize', repositionBurndown);
