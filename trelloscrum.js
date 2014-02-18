@@ -138,6 +138,7 @@ var recalcListAndTotal = debounce(function($el){
 
 var recalcTotalsObserver = new CrossBrowser.MutationObserver(function(mutations)
 {	
+    console.log('recalcOberser called', mutations);
 	// Determine if the mutation event included an ACTUAL change to the list rather than
 	// a modification caused by this extension making an update to points, etc. (prevents
 	// infinite recursion).
@@ -168,6 +169,7 @@ var recalcTotalsObserver = new CrossBrowser.MutationObserver(function(mutations)
 				doFullRefresh = true;
 			}
 		}
+
 	});
 	
 	if(doFullRefresh){
@@ -176,10 +178,18 @@ var recalcTotalsObserver = new CrossBrowser.MutationObserver(function(mutations)
 		calcListPoints();
 	}
     
-    $editControls = $(".card-detail-title .edit-controls");
+    var $editControls = $(".card-detail-title .edit-controls");
+    var $checklistEditControls = $('.checklist-item-details .edit-controls');
+    
     if($editControls.length > 0)
     {
         showPointPicker($editControls.get(0));
+    }
+
+    if($checklistEditControls.length > 0)
+    {
+        showPointPickerChecklist($checklistEditControls.get(0));
+
     }
 });
 recalcTotalsObserver.observe(document.body, obsConfig);
@@ -691,7 +701,7 @@ function showPointPicker(location) {
 	if($(location).find('.picker').length) return;
 	var $picker = $('<div/>', {class: "picker"}).appendTo('.card-detail-title .edit-controls');
 	$picker.append($('<span>', {class: "picker-title"}).text("Estimated Points"));
-	
+	console.log('had picker? ',$picker);	
 	var estimateSequence = (S4T_SETTINGS[SETTING_NAME_ESTIMATES].replace(/ /g, '')).split(',');
 	for (var i in estimateSequence) $picker.append($('<span>', {class: "point-value"}).text(estimateSequence[i]).click(function(){
 		var value = $(this).text();
@@ -726,6 +736,30 @@ function showPointPicker(location) {
 		return false
 	}))
 };
+
+//the story point picker for checklist
+function showPointPickerChecklist(location) {
+    var $parent = $(location).parent();
+	if($(location).find('.picker').length) return;
+	var $picker = $('<div/>', {class: "picker"}).appendTo('.checklist-item-details .edit-controls');
+	var estimateSequence = (S4T_SETTINGS[SETTING_NAME_ESTIMATES]).split(',');
+	for (var i in estimateSequence) $picker.append($('<span>', {class: "point-value"}).text(estimateSequence[i]).click(function(){
+		var value = $(this).text();
+        // use our parent element to locate the inner textarea
+        var $text = $parent.find('textarea');
+		var text = $text.val();
+
+		// replace our new
+		var replaceText = text.match(reg)?text.replace(reg, '('+value+') '):'('+value+') ' + text;
+        $text.val(replaceText);
+
+		// then click our button so it all gets saved away
+		$(".checklist-item-details .edit .js-save-edit").click();
+
+		return false
+	}))
+};
+
 
 
 //for export
