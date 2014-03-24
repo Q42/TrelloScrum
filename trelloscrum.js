@@ -261,9 +261,9 @@ function showBurndown()
     repositionBurndown();
 }
 
+var settingsFrameId = 'settingsFrame';
 function showSettings()
 {
-	var settingsFrameId = 'settingsFrame';
     $('body').addClass("window-up");
     $('.window').css("display", "block").css("top", "50px");
 
@@ -342,8 +342,8 @@ function showSettings()
 			e.preventDefault();
 
 			// Save the settings (persists them using Chrome cloud, LocalStorage, or Cookies - in that order of preference if available).
-			S4T_SETTINGS[SETTING_NAME_LINK_STYLE] = $('iframe').contents().find('input:radio[name='+burndownLinkSetting_radioName+']:checked').val();
-			S4T_SETTINGS[SETTING_NAME_ESTIMATES] = $('iframe').contents().find('#'+estimateFieldId).val();
+			S4T_SETTINGS[SETTING_NAME_LINK_STYLE] = $('#'+settingsFrameId).contents().find('input:radio[name='+burndownLinkSetting_radioName+']:checked').val();
+			S4T_SETTINGS[SETTING_NAME_ESTIMATES] = $('#'+settingsFrameId).contents().find('#'+estimateFieldId).val();
 
 			// Persist all settings.
 			$.each(S4T_ALL_SETTINGS, function(i, settingName){
@@ -852,7 +852,7 @@ function refreshSettings(){
 
 function onSettingsUpdated(){
 	// Temporary indication to the user that the settings were saved (might not always be on screen, but that's not a problem).
-	$('iframe').contents().find('#s4tSaved').show().fadeOut(2000, "linear");
+	$('#'+settingsFrameId).contents().find('#s4tSaved').show().fadeOut(2000, "linear");
 	
 	// Refresh the links because link-settings may have changed.
 	$('.s4tLink').remove();
