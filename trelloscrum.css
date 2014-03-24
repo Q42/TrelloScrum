@@ -41,9 +41,15 @@
 	padding: 0 4px 0 17px !important;
 }
 
+.picker-consumed,
 .picker {
-	float: right;
-	padding-top: 5px;
+	float: left;
+	width: 100%;
+	padding: 10px 0;
+}
+
+.picker-title {
+	padding-right: 20px;
 }
 
 .points-done-icon{
