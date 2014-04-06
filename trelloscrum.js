@@ -690,7 +690,7 @@ function showPointPicker(location) {
 	if($(location).find('.picker').length) return;
 	var $picker = $('<div/>', {class: "picker"}).appendTo('.card-detail-title .edit-controls');
 	
-	var estimateSequence = (S4T_SETTINGS[SETTING_NAME_ESTIMATES]).split(',');
+	var estimateSequence = (S4T_SETTINGS[SETTING_NAME_ESTIMATES].replace(/ /g, '')).split(',');
 	for (var i in estimateSequence) $picker.append($('<span>', {class: "point-value"}).text(estimateSequence[i]).click(function(){
 		var value = $(this).text();
 		var $text = $('.card-detail-title .edit textarea');
