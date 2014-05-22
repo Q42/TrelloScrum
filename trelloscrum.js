@@ -706,6 +706,38 @@ function showPointPicker(location) {
 	}))
 };
 
+//add time to an open card's expended effort
+function addExpendedTime($title, timeIncrement) {
+
+	timeIncrement = timeIncrement || 0.5;
+	var timeRegexp = /\[([\d\.]+)\]/;
+	var title = $title.val();
+	var match = timeRegexp.exec(title);
+	var time = match? parseFloat(match[1]) : 0;
+	time += timeIncrement;
+	var newTimeString = "[" + time + "]";
+
+	if (match) {
+		title = title.replace(timeRegexp, newTimeString);
+	}
+	else {
+		title += " " + newTimeString;
+	}
+	$title.val(title);
+
+}
+
+//automate opening, editing, and saving the open card's title
+function editCardAddingExpendedTime(timeIncrement) {
+	//start editing title
+	$('.card-detail-title:not(.editing) h2').click();
+
+	//add time to title
+	addExpendedTime($('.card-detail-title textarea'), timeIncrement);
+
+	//save changes
+	$(".card-detail-title .edit .js-save-edit").click();
+}
 
 //for export
 var $excel_btn,$excel_dl;
