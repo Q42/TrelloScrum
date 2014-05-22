@@ -179,7 +179,13 @@ var recalcTotalsObserver = new CrossBrowser.MutationObserver(function(mutations)
     $editControls = $(".card-detail-title .edit-controls");
     if($editControls.length > 0)
     {
-        showPointPicker($editControls.get(0));
+      showPointPicker($editControls.get(0));
+    }
+
+    $sidebarControls = $(".window-sidebar .other-actions");
+    if ($sidebarControls.length > 0)
+    {
+      showAddExpendedTimeButton($sidebarControls);
     }
 });
 recalcTotalsObserver.observe(document.body, obsConfig);
@@ -705,6 +711,14 @@ function showPointPicker(location) {
 		return false
 	}))
 };
+
+function showAddExpendedTimeButton($sidebarControls) {
+	if ($sidebarControls.find(".trello-scrum-add-expanded-time").length) return;
+	var $button = $('<a class="button-link trello-scrum-add-expanded-time" title="Add a fixed amount of time to the current expended time total"> <span class="icon-sm icon-add"></span> Add Work </a>');
+	$button.click(function(){editCardAddingExpendedTime();});
+	$sidebarControls.append($button);
+}
+
 
 //add time to an open card's expended effort
 function addExpendedTime($title, timeIncrement) {
