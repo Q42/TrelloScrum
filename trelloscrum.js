@@ -743,7 +743,15 @@ function addExpendedTime($title, timeIncrement) {
 	var match = timeRegexp.exec(title);
 	var time = match? parseFloat(match[1]) : 0;
 	time += timeIncrement;
-	var newTimeString = "[" + time + "]";
+	var newTimeString = time.toString();
+
+	//trim numbers after decimal
+	var decimalIndex = newTimeString.indexOf(".");
+	if (decimalIndex >= 0) {
+		newTimeString = newTimeString.substr(0, decimalIndex + 3);
+	}
+
+	newTimeString = "[" + newTimeString + "]";
 
 	if (match) {
 		title = title.replace(timeRegexp, newTimeString);
