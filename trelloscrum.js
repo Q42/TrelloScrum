@@ -16,6 +16,7 @@
 ** Kit Glennon <https://github.com/kitglen>
 ** Samuel Gaus <https://github.com/gausie>
 ** Sean Colombo <https://github.com/seancolombo>
+** Roger Braunstein <https://github.com/partlyhuman>
 **
 */
 
@@ -51,10 +52,12 @@ var _pointsAttr = ['cpoints', 'points'];
 var S4T_SETTINGS = [];
 var SETTING_NAME_LINK_STYLE = "burndownLinkStyle";
 var SETTING_NAME_ESTIMATES = "estimatesSequence";
-var S4T_ALL_SETTINGS = [SETTING_NAME_LINK_STYLE, SETTING_NAME_ESTIMATES];
+var SETTING_NAME_INCREMENT = "expendedTimeIncrement";
+var S4T_ALL_SETTINGS = [SETTING_NAME_LINK_STYLE, SETTING_NAME_ESTIMATES, SETTING_NAME_INCREMENT];
 var S4T_SETTING_DEFAULTS = {};
 S4T_SETTING_DEFAULTS[SETTING_NAME_LINK_STYLE] = 'full';
 S4T_SETTING_DEFAULTS[SETTING_NAME_ESTIMATES] = _pointSeq.join();
+S4T_SETTING_DEFAULTS[SETTING_NAME_INCREMENT] = 0.5;
 refreshSettings(); // get the settings right away (may take a little bit if using Chrome cloud storage)
 
 //internals
@@ -283,6 +286,7 @@ function showSettings()
 		// Load the current settings (with defaults in case Settings haven't been set).
 		var setting_link = S4T_SETTINGS[SETTING_NAME_LINK_STYLE];
 		var setting_estimateSeq = S4T_SETTINGS[SETTING_NAME_ESTIMATES];
+		var setting_increment = S4T_SETTINGS[SETTING_NAME_INCREMENT];
 	
 		var settingsDiv = $('<div/>', {style: "padding:0px 10px;font-family:'Helvetica Neue', Arial, Helvetica, sans-serif;"});
 		var iframeHeader = $('<h3/>', {style: 'text-align: center;'});
@@ -298,51 +302,57 @@ function showSettings()
 		legend_burndownLink.text("Burndown Chart link");
 		var burndownLinkSetting_radioName = 'burndownLinkSetting';
 		fieldset_burndownLink.append(legend_burndownLink);
-			var burndownRadio_full = $('<input/>', {type: 'radio', name: burndownLinkSetting_radioName, id: 'link_full', value: 'full'});
-			if(setting_link == 'full'){
-				burndownRadio_full.prop('checked', true);
-			}
-			var label_full = $('<label/>', {for: 'link_full'});
-			label_full.text('Enable "Burndown Chart" link (recommended)');
-			fieldset_burndownLink.append(burndownRadio_full).append(label_full).append("<br/>");
+		var burndownRadio_full = $('<input/>', {type: 'radio', name: burndownLinkSetting_radioName, id: 'link_full', value: 'full'});
+		if(setting_link == 'full'){
+			burndownRadio_full.prop('checked', true);
+		}
+		var label_full = $('<label/>', {for: 'link_full'});
+		label_full.text('Enable "Burndown Chart" link (recommended)');
+		fieldset_burndownLink.append(burndownRadio_full).append(label_full).append("<br/>");
 
-			var burndownRadio_icon = $('<input/>', {type: 'radio', name: burndownLinkSetting_radioName, id: 'link_icon', value: 'icon'});
-			if(setting_link == 'icon'){
-				burndownRadio_icon.prop('checked', true);
-			}
-			var label_icon = $('<label/>', {for: 'link_icon'});
-			label_icon.text('Icon only');
-			fieldset_burndownLink.append(burndownRadio_icon).append(label_icon).append("<br/>");
+		var burndownRadio_icon = $('<input/>', {type: 'radio', name: burndownLinkSetting_radioName, id: 'link_icon', value: 'icon'});
+		if(setting_link == 'icon'){
+			burndownRadio_icon.prop('checked', true);
+		}
+		var label_icon = $('<label/>', {for: 'link_icon'});
+		label_icon.text('Icon only');
+		fieldset_burndownLink.append(burndownRadio_icon).append(label_icon).append("<br/>");
 
-			var burndownRadio_none = $('<input/>', {type: 'radio', name: burndownLinkSetting_radioName, id: 'link_none', value: 'none'});
-			if(setting_link == 'none'){
-				burndownRadio_none.prop('checked', true);
-			}
-			var label_none = $('<label/>', {for: 'link_none'});
-			label_none.text('Disable completely');
-			fieldset_burndownLink.append(burndownRadio_none).append(label_none).append("<br/>");
-		
+		var burndownRadio_none = $('<input/>', {type: 'radio', name: burndownLinkSetting_radioName, id: 'link_none', value: 'none'});
+		if(setting_link == 'none'){
+			burndownRadio_none.prop('checked', true);
+		}
+		var label_none = $('<label/>', {for: 'link_none'});
+		label_none.text('Disable completely');
+		fieldset_burndownLink.append(burndownRadio_none).append(label_none).append("<br/>");
+	
 		// Which estimate buttons should show up.
 		var fieldset_estimateButtons = $('<fieldset/>', {style: 'margin-top:5px'});
 		var legend_estimateButtons = $('<legend/>');
 		legend_estimateButtons.text("Estimate Buttons");
 		fieldset_estimateButtons.append(legend_estimateButtons);
-			var explanation = $('<div/>').text("List out the values you want to appear on the estimate buttons, separated by commas. They can be whole numbers, decimals, or a question mark.");
-			fieldset_estimateButtons.append(explanation);
-			
-			var estimateFieldId = 'pointSequenceToUse';
-			var estimateField = $('<input/>', {id: estimateFieldId, size: 40, val: setting_estimateSeq});
-			fieldset_estimateButtons.append(estimateField);
-			
-			var titleTextStr = "Original sequence is: " + _pointSeq.join();
-			var restoreDefaultsButton = $('<button/>')
-											.text('restore to original values')
-											.attr('title', titleTextStr)
-											.click(function(e){
-												e.preventDefault();
-												$('#'+settingsFrameId).contents().find('#'+estimateFieldId).val(_pointSeq.join());
-											});
-			fieldset_estimateButtons.append(restoreDefaultsButton);
+		var explanation = $('<div/>').text("List out the values you want to appear on the estimate buttons, separated by commas. They can be whole numbers, decimals, or a question mark.");
+		fieldset_estimateButtons.append(explanation);
+		
+		var estimateFieldId = 'pointSequenceToUse';
+		var estimateField = $('<input/>', {id: estimateFieldId, size: 40, val: setting_estimateSeq});
+		fieldset_estimateButtons.append(estimateField);
+		
+		var titleTextStr = "Original sequence is: " + _pointSeq.join();
+		var restoreDefaultsButton = $('<button/>')
+										.text('restore to original values')
+										.attr('title', titleTextStr)
+										.click(function(e){
+											e.preventDefault();
+											$('#'+settingsFrameId).contents().find('#'+estimateFieldId).val(_pointSeq.join());
+										});
+		fieldset_estimateButtons.append(restoreDefaultsButton);
+
+		var fieldset_incrementField = $('<fieldset><legend>Work time increment</legend><div>The amount of time to add to the expended time tally when add work button is pressed (default 0.5 or 30 minutes).</div></fieldset>');
+		var incrementFieldId = 'timeIncrement';
+		var incrementField = $('<input/>', {id: incrementFieldId, size: 5, val: setting_increment});
+		var resetIncrementButton = $('<button>Reset to Default</button>').click(function(e){e.preventDefault(); incrementField.val("0.5");});
+		fieldset_incrementField.append(incrementField).append(resetIncrementButton);
 
 		var saveButton = $('<button/>', {style:'margin-top:5px'}).text('Save Settings').click(function(e){
 			e.preventDefault();
@@ -350,6 +360,7 @@ function showSettings()
 			// Save the settings (persists them using Chrome cloud, LocalStorage, or Cookies - in that order of preference if available).
 			S4T_SETTINGS[SETTING_NAME_LINK_STYLE] = $('#'+settingsFrameId).contents().find('input:radio[name='+burndownLinkSetting_radioName+']:checked').val();
 			S4T_SETTINGS[SETTING_NAME_ESTIMATES] = $('#'+settingsFrameId).contents().find('#'+estimateFieldId).val();
+			S4T_SETTINGS[SETTING_NAME_INCREMENT] = parseFloat($('#'+settingsFrameId).contents().find('#'+incrementFieldId).val());
 
 			// Persist all settings.
 			$.each(S4T_ALL_SETTINGS, function(i, settingName){
@@ -365,6 +376,7 @@ function showSettings()
 		// Set up the form (all added down here to be easier to change the order).
 		settingsForm.append(fieldset_burndownLink);
 		settingsForm.append(fieldset_estimateButtons);
+		settingsForm.append(fieldset_incrementField);
 		settingsForm.append(saveButton);
 		settingsForm.append(savedIndicator);
 	}
@@ -391,7 +403,7 @@ function showSettings()
 
 	// Trello swallows normal input, so things like checkboxes and radio buttons don't work right... so we stuff everything in an iframe.
 	var iframeObj = $('<iframe/>', {frameborder: '0',
-						 style: 'width: 670px; height: 528px;', /* 512 was fine on Chrome, but FF requires 528 to avoid scrollbars */
+						 style: 'width: 670px; height: 600px;',
 						 id: settingsFrameId,
 	});
 	$windowWrapper = $('.window-wrapper');
@@ -712,6 +724,7 @@ function showPointPicker(location) {
 	}))
 };
 
+//inject a button into card controls that increments time spent
 function showAddExpendedTimeButton($sidebarControls) {
 	if ($sidebarControls.find(".trello-scrum-add-expanded-time").length) return;
 	var $button = $('<a class="button-link trello-scrum-add-expanded-time" title="Add a fixed amount of time to the current expended time total"> <span class="icon-sm icon-add"></span> Add Work </a>');
@@ -723,6 +736,7 @@ function showAddExpendedTimeButton($sidebarControls) {
 //add time to an open card's expended effort
 function addExpendedTime($title, timeIncrement) {
 
+	if (!$title) return;
 	timeIncrement = timeIncrement || 0.5;
 	var timeRegexp = /\[([\d\.]+)\]/;
 	var title = $title.val();
@@ -747,7 +761,7 @@ function editCardAddingExpendedTime(timeIncrement) {
 	$('.card-detail-title:not(.editing) h2').click();
 
 	//add time to title
-	addExpendedTime($('.card-detail-title textarea'), timeIncrement);
+	addExpendedTime($('.card-detail-title textarea'), S4T_SETTINGS[SETTING_NAME_INCREMENT]);
 
 	//save changes
 	$(".card-detail-title .edit .js-save-edit").click();
