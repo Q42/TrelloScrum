@@ -80,3 +80,12 @@
     margin-top:1px;
 }
 /* == end b4t integration == */
+
+/* Display card number */
+span.card-short-id.hide {
+	display: inline-block;
+	font-size: 12px;
+	padding: 0;
+	margin-right: .5em;
+	color: #939393;
+}
