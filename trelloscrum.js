@@ -420,17 +420,18 @@ function hideBurndown()
 
 function repositionBurndown()
 {
-    windowWidth = $(window).width();
-    if(windowWidth < 0) // todo change this to a n actual number (probably 710 or so)
-    {
-        // todo shrink our iframe to an appropriate size.  contents should wrap
-    }
-    else
-    {
-        burndownWindowWidth = 690;
-        leftPadding = (windowWidth - burndownWindowWidth) / 2.0;
-        $('.window').css("left", leftPadding);
-    }
+    // NOTE: With the most recent Trello update, I don't think we have to position the window manually anymore.
+    //windowWidth = $(window).width();
+    //if(windowWidth < 0) // todo change this to a n actual number (probably 710 or so)
+    //{
+    //    // todo shrink our iframe to an appropriate size.  contents should wrap
+    //}
+    //else
+    //{
+    //    burndownWindowWidth = 690;
+    //    leftPadding = (windowWidth - burndownWindowWidth) / 2.0;
+    //    $('.window').css("left", leftPadding);
+    //}
 }
 
 //calculate board totals
