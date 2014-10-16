@@ -228,7 +228,7 @@ function showBurndown()
 	if($memberObj.length == 0){
 		$memberObj = $('.header-user .member-initials'); // if the user doesn't have an icon
 	}
-	var username = $memberObj.attr('title').match(/\((.*?)\)$/)[1];
+	var username = $memberObj.attr('title').match(/\(([^\)\(]*?)\)$/)[1];
 
 	// Find the short-link board name, etc. so that the back-end can figure out what board this is.
 	var shortLink = document.location.href.match(/b\/([A-Za-z0-9]{8})\//)[1];
