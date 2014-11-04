@@ -16,6 +16,7 @@
 ** Kit Glennon <https://github.com/kitglen>
 ** Samuel Gaus <https://github.com/gausie>
 ** Sean Colombo <https://github.com/seancolombo>
+** Neal Sanche <https://github.com/nealsanche>
 **
 */
 
@@ -629,7 +630,7 @@ function ListCard(el, identifier){
 					.text(that.points)
 					[(consumed?'add':'remove')+'Class']('consumed')
 					[(onfire?'add':'remove')+'Class']('onfire')
-					.attr({title: 'This card has '+that.points+ (consumed?' consumed':'') + (onfire?' on fire':'') +' storypoint' + (that.points == 1 ? '.' : 's.')})
+					.attr({title: 'This card has '+that.points+ (consumed?' consumed':'') + (onfire?' remaining':'') +' hour' + (that.points == 1 ? '.' : 's.')})
 					.prependTo($card.find('.badges'));
 
 				// Update the DOM element's textContent and data if there were changes.
@@ -693,7 +694,7 @@ function ListCard(el, identifier){
 function showPointPicker(location) {
 	if($(location).find('.picker').length) return;
 	var $picker = $('<div/>', {class: "picker"}).appendTo('.card-detail-title .edit-controls');
-	$picker.append($('<span>', {class: "picker-title"}).text("Estimated Points"));
+	$picker.append($('<span>', {class: "picker-title"}).text("Estimated Hours"));
 	
 	var estimateSequence = (S4T_SETTINGS[SETTING_NAME_ESTIMATES].replace(/ /g, '')).split(',');
 	for (var i in estimateSequence) $picker.append($('<span>', {class: "point-value"}).text(estimateSequence[i]).click(function(){
@@ -709,7 +710,7 @@ function showPointPicker(location) {
 	
 	if($(location).find('.picker-consumed').length) return;
 	var $pickerConsumed = $('<div/>', {class: "picker-consumed"}).appendTo('.card-detail-title .edit-controls');
-	$pickerConsumed.append($('<span>', {class: "picker-title"}).text("Consumed Points"));
+	$pickerConsumed.append($('<span>', {class: "picker-title"}).text("Consumed Hours"));
 
 	var consumedSequence = (S4T_SETTINGS[SETTING_NAME_ESTIMATES]).split(',');
 	for (var i in consumedSequence) $pickerConsumed.append($('<span>', {class: "point-value"}).text(consumedSequence[i]).click(function(){
@@ -725,7 +726,7 @@ function showPointPicker(location) {
 
 	if($(location).find('.picker-onfire').length) return;
 	var $pickerOnFire = $('<div/>', {class: "picker-onfire"}).appendTo('.card-detail-title .edit-controls');
-	$pickerOnFire.append($('<span>', {class: "picker-title"}).text("On Fire Points"));
+	$pickerOnFire.append($('<span>', {class: "picker-title"}).text("Remaining Hours"));
 
 	var pickerSequence = (S4T_SETTINGS[SETTING_NAME_ESTIMATES]).split(',');
 	for (var i in pickerSequence) $pickerOnFire.append($('<span>', {class: "point-value"}).text(pickerSequence[i]).click(function(){
