@@ -16,6 +16,7 @@
 ** Kit Glennon <https://github.com/kitglen>
 ** Samuel Gaus <https://github.com/gausie>
 ** Sean Colombo <https://github.com/seancolombo>
+** Neal Sanche <https://github.com/nealsanche>
 **
 */
 
@@ -45,7 +46,7 @@ var obsConfig = { childList: true, characterData: true, attributes: false, subtr
 //default story point picker sequence (can be overridden in the Scrum for Trello 'Settings' popup)
 var _pointSeq = ['?', 0, .5, 1, 2, 3, 5, 8, 13, 21];
 //attributes representing points values for card
-var _pointsAttr = ['cpoints', 'points'];
+var _pointsAttr = ['onfire', 'cpoints', 'points'];
 
 // All settings and their defaults.
 var S4T_SETTINGS = [];
@@ -58,8 +59,9 @@ S4T_SETTING_DEFAULTS[SETTING_NAME_ESTIMATES] = _pointSeq.join();
 refreshSettings(); // get the settings right away (may take a little bit if using Chrome cloud storage)
 
 //internals
-var reg = /((?:^|\s))\((\x3f|\d*\.?\d+)(\))\s?/m, //parse regexp- accepts digits, decimals and '?', surrounded by ()
-    regC = /((?:^|\s))\[(\x3f|\d*\.?\d+)(\])\s?/m, //parse regexp- accepts digits, decimals and '?', surrounded by []
+var reg = /((?:^|\s))?\((\x3f|\d*\.?\d+)(\))\s?/m, //parse regexp- accepts digits, decimals and '?', surrounded by ()
+    regC = /((?:^|\s))?\[(\x3f|\d*\.?\d+)(\])\s?/m, //parse regexp- accepts digits, decimals and '?', surrounded by []
+    regF = /((?:^|\s))?\{(\x3f|\d*\.?\d+)(\})\s?/m, //parse regexp- accepts digits, decimals and '?', surrounded by {}
     iconUrl, pointsDoneUrl,
 	flameUrl, flame18Url,
 	scrumLogoUrl, scrumLogo18Url;
@@ -581,8 +583,9 @@ function ListCard(el, identifier){
 	el.listCard[identifier]=this;
 
 	var points=-1,
-		consumed=identifier!=='points',
-		regexp=consumed?regC:reg,
+		consumed=identifier=='cpoints',
+		onfire=identifier=='onfire',
+		regexp=consumed ? regC : onfire ? regF : reg,
 		parsed,
 		that=this,
 		busy=false,
@@ -622,18 +625,19 @@ function ListCard(el, identifier){
 
 			clearTimeout(to2);
 			to2 = setTimeout(function(){
-				// Add the badge (for this point-type: regular or consumed) to the badges div.
+				// Add the badge (for this point-type: regular, consumed, or onfire) to the badges div.
 				$badge
 					.text(that.points)
 					[(consumed?'add':'remove')+'Class']('consumed')
-					.attr({title: 'This card has '+that.points+ (consumed?' consumed':'')+' storypoint' + (that.points == 1 ? '.' : 's.')})
+					[(onfire?'add':'remove')+'Class']('onfire')
+					.attr({title: 'This card has '+that.points+ (consumed?' consumed':'') + (onfire?' remaining':'') +' hour' + (that.points == 1 ? '.' : 's.')})
 					.prependTo($card.find('.badges'));
 
 				// Update the DOM element's textContent and data if there were changes.
 				if(titleTextContent != parsedTitle){
 					$title.data('orig-title', titleTextContent); // store the non-mutilated title (with all of the estimates/time-spent in it).
 				}
-				parsedTitle = $.trim(el._title.replace(reg,'$1').replace(regC,'$1'));
+				parsedTitle = $.trim(el._title.replace(reg,'$1').replace(regC,'$1').replace(regF,'$1'));
 				el._title = parsedTitle;
 				$title.data('parsed-title', parsedTitle); // save it to the DOM element so that both badge-types can refer back to it.
 				$title[0].childNodes[1].textContent = parsedTitle;
@@ -690,7 +694,7 @@ function ListCard(el, identifier){
 function showPointPicker(location) {
 	if($(location).find('.picker').length) return;
 	var $picker = $('<div/>', {class: "picker"}).appendTo('.card-detail-title .edit-controls');
-	$picker.append($('<span>', {class: "picker-title"}).text("Estimated Points"));
+	$picker.append($('<span>', {class: "picker-title"}).text("Estimated Hours"));
 	
 	var estimateSequence = (S4T_SETTINGS[SETTING_NAME_ESTIMATES].replace(/ /g, '')).split(',');
 	for (var i in estimateSequence) $picker.append($('<span>', {class: "point-value"}).text(estimateSequence[i]).click(function(){
@@ -701,15 +705,12 @@ function showPointPicker(location) {
 		// replace our new
 		$text[0].value=text.match(reg)?text.replace(reg, '('+value+') '):'('+value+') ' + text;
 
-		// then click our button so it all gets saved away
-		$(".card-detail-title .edit .js-save-edit").click();
-
 		return false
 	}))
 	
 	if($(location).find('.picker-consumed').length) return;
 	var $pickerConsumed = $('<div/>', {class: "picker-consumed"}).appendTo('.card-detail-title .edit-controls');
-	$pickerConsumed.append($('<span>', {class: "picker-title"}).text("Consumed Points"));
+	$pickerConsumed.append($('<span>', {class: "picker-title"}).text("Consumed Hours"));
 
 	var consumedSequence = (S4T_SETTINGS[SETTING_NAME_ESTIMATES]).split(',');
 	for (var i in consumedSequence) $pickerConsumed.append($('<span>', {class: "point-value"}).text(consumedSequence[i]).click(function(){
@@ -718,13 +719,27 @@ function showPointPicker(location) {
 		var text = $text.val();
 
 		// replace our new
-		$text[0].value=text.match(regC)?text.replace(regC, ' ['+value+']'):text + ' ['+value+']';
-
-		// then click our button so it all gets saved away
-		$(".card-detail-title .edit .js-save-edit").click();
+		$text[0].value=text.match(regC)?text.replace(regC, ' ['+value+'] '):text + ' ['+value+'] ';
 
 		return false
 	}))
+
+	if($(location).find('.picker-onfire').length) return;
+	var $pickerOnFire = $('<div/>', {class: "picker-onfire"}).appendTo('.card-detail-title .edit-controls');
+	$pickerOnFire.append($('<span>', {class: "picker-title"}).text("Remaining Hours"));
+
+	var pickerSequence = (S4T_SETTINGS[SETTING_NAME_ESTIMATES]).split(',');
+	for (var i in pickerSequence) $pickerOnFire.append($('<span>', {class: "point-value"}).text(pickerSequence[i]).click(function(){
+		var value = $(this).text();
+		var $text = $('.card-detail-title .edit textarea');
+		var text = $text.val();
+
+		// replace our new
+		$text[0].value=text.match(regF)?text.replace(regF, ' {'+value+'} '):text + ' {'+value+'} ';
+
+		return false
+	}))
+
 };
 
 

@@ -16,6 +16,11 @@
 	opacity: 0.5;
 }
 
+.list-total .onfire{
+	margin-right:3px;
+	color: #FF0000 !important;
+}
+
 .list .list-title h2 {
 	float: none !important;
 	display: inline !important;
@@ -41,6 +46,7 @@
 	padding: 0 4px 0 17px !important;
 }
 
+.picker-onfire,
 .picker-consumed,
 .picker {
 	float: left;
@@ -77,6 +83,12 @@
 
 .badge-points.consumed{
 	opacity: 0.5;
+}
+
+.badge-points.onfire{
+	background-color: #FF6580 !important;
+	border-color: #FF5b72 !important;
+	border-bottom-color: #FF4b5f !important;	
 }
 
 /* == b4t integration==*/
