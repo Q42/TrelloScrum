@@ -752,8 +752,7 @@ function showPointPickerChecklist(location) {
 		var text = $text.val();
 
 		// replace our new
-		var replaceText = text.match(reg)?text.replace(reg, '('+value+') '):'('+value+') ' + text;
-		$text.val(replaceText);
+		$text[0].value=text.match(reg)?text.replace(reg, '('+value+') '):'('+value+') ' + text;
 
 		// then click our button so it all gets saved away
 		$(".checklist-item-details .edit .js-save-edit").click();
