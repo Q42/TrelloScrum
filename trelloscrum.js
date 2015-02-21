@@ -739,19 +739,19 @@ function showPointPicker(location) {
 
 //the story point picker for checklist
 function showPointPickerChecklist(location) {
-    var $parent = $(location).parent();
+	var $parent = $(location).parent();
 	if($(location).find('.picker').length) return;
 	var $picker = $('<div/>', {class: "picker"}).appendTo('.checklist-item-details .edit-controls');
 	var estimateSequence = (S4T_SETTINGS[SETTING_NAME_ESTIMATES]).split(',');
 	for (var i in estimateSequence) $picker.append($('<span>', {class: "point-value"}).text(estimateSequence[i]).click(function(){
 		var value = $(this).text();
-        // use our parent element to locate the inner textarea
-        var $text = $parent.find('textarea');
+		// use our parent element to locate the inner textarea
+		var $text = $parent.find('textarea');
 		var text = $text.val();
 
 		// replace our new
 		var replaceText = text.match(reg)?text.replace(reg, '('+value+') '):'('+value+') ' + text;
-        $text.val(replaceText);
+		$text.val(replaceText);
 
 		// then click our button so it all gets saved away
 		$(".checklist-item-details .edit .js-save-edit").click();
