@@ -701,7 +701,7 @@ function showPointPicker(location) {
 	if($(location).find('.picker').length) return;
 	var $picker = $('<div/>', {class: "picker"}).appendTo('.card-detail-title .edit-controls');
 	$picker.append($('<span>', {class: "picker-title"}).text("Estimated Points"));
-	console.log('had picker? ',$picker);	
+
 	var estimateSequence = (S4T_SETTINGS[SETTING_NAME_ESTIMATES].replace(/ /g, '')).split(',');
 	for (var i in estimateSequence) $picker.append($('<span>', {class: "point-value"}).text(estimateSequence[i]).click(function(){
 		var value = $(this).text();
@@ -821,16 +821,14 @@ function calculateCheckListPoints()
 	var consumedTotal = 0;
 	for (var i in _pointSeq)
 	{
-		console.log("text = " + $checkListItem.eq(i).text());
 		var estimateParsed = $checkListItem.eq(i).text().match(reg);
 		var consumedParsed = $checkListItem.eq(i).text().match(regC);
-		console.log("parsed = " + estimateParsed);
+
 		var estimatePoints = estimateParsed?estimateParsed[2]:0;
 		var consumedPoints = consumedParsed?consumedParsed[2]:0;
-		console.log("points = " + estimatePoints);
+
 		estimateTotal += Number(estimatePoints);
 		consumedTotal += Number(consumedPoints);
-		console.log("total = " + estimateTotal);
 	}
 
 	return {
