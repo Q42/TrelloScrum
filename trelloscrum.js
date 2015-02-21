@@ -768,8 +768,8 @@ function showPointPickerChecklist(location) {
 	var $picker = $('<div/>', {class: "picker-consumed"}).appendTo('.checklist-item-details .edit-controls');
 	$picker.append($('<span>', {class: "picker-title"}).text("Consumed Points"));
 
-	var estimateSequence = (S4T_SETTINGS[SETTING_NAME_ESTIMATES]).split(',');
-	for (var i in estimateSequence) $picker.append($('<span>', {class: "point-value"}).text(estimateSequence[i]).click(function(){
+	var consumedSequence = (S4T_SETTINGS[SETTING_NAME_ESTIMATES]).split(',');
+	for (var i in consumedSequence) $picker.append($('<span>', {class: "point-value"}).text(consumedSequence[i]).click(function(){
 		var value = $(this).text();
 		// use our parent element to locate the inner textarea
 		var $text = $parent.find('textarea');
