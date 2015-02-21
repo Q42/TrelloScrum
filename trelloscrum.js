@@ -803,8 +803,8 @@ function updateCardTitle()
 		$title[0].value = newTitleValue;
 
 		// add edit button to card title edit controls
-		$('<div class="edit-controls clearfix">').appendTo('.card-detail-title .edit');
-		$('<input type="submit" class="primary confirm js-save-edit" value="Save">').appendTo('.card-detail-title .edit-controls');
+		$('<div/>', {class: "edit-controls clearfix"}).appendTo('.card-detail-title .edit');
+		$('<input/>', {class: "primary confirm js-save-edit", value: "Save"}).appendTo('.card-detail-title .edit-controls');
 
 		// then click our button so it all gets saved away
 		$(".card-detail-title .edit .js-save-edit").click();
