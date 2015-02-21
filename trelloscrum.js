@@ -757,6 +757,9 @@ function showPointPickerChecklist(location) {
 		// then click our button so it all gets saved away
 		$(".checklist-item-details .edit .js-save-edit").click();
 
+		// updates points of a card based on all checklists items
+		updateCardTitle();
+
 		return false
 	}))
 
@@ -778,11 +781,63 @@ function showPointPickerChecklist(location) {
 		// then click our button so it all gets saved away
 		$(".checklist-item-details .edit .js-save-edit").click();
 
+		// updates points of a card based on all checklists items
+		updateCardTitle();
+
 		return false
 	}))
 };
 
+function updateCardTitle()
+{
+	// timeout to allow enough time for checklist item title to update
+	setTimeout(function() {
+		var $currentTitle = $('.window-title .window-title-text');
+		var titleText = $currentTitle.text();
+		var $title = $('.card-detail-title .edit textarea');
+		$(".card-detail-title").addClass("editing");
 
+		var totals = calculateCheckListPoints();
+		var newTitleValue = titleText.match(reg)?titleText.replace(reg, '('+totals.estimateTotal+') '):'('+totals.estimateTotal+') ' + titleText;
+		newTitleValue = newTitleValue.match(regC)?newTitleValue.replace(regC, ' ['+totals.consumedTotal+']'):newTitleValue + ' ['+totals.consumedTotal+']';
+		$title[0].value = newTitleValue;
+
+		// add edit button to card title edit controls
+		$('<div class="edit-controls clearfix">').appendTo('.card-detail-title .edit');
+		$('<input type="submit" class="primary confirm js-save-edit" value="Save">').appendTo('.card-detail-title .edit-controls');
+
+		// then click our button so it all gets saved away
+		$(".card-detail-title .edit .js-save-edit").click();
+
+	}, 500);
+
+	return true;
+}
+
+function calculateCheckListPoints()
+{
+	var $checkListItem = $('.checklist-list .checklist .checklist-items-list .checklist-item .checklist-item-details .checklist-item-details-text');
+	var estimateTotal = 0;
+	var consumedTotal = 0;
+	for (var i in _pointSeq)
+	{
+		console.log("text = " + $checkListItem.eq(i).text());
+		var estimateParsed = $checkListItem.eq(i).text().match(reg);
+		var consumedParsed = $checkListItem.eq(i).text().match(regC);
+		console.log("parsed = " + estimateParsed);
+		var estimatePoints = estimateParsed?estimateParsed[2]:0;
+		var consumedPoints = consumedParsed?consumedParsed[2]:0;
+		console.log("points = " + estimatePoints);
+		estimateTotal += Number(estimatePoints);
+		consumedTotal += Number(consumedPoints);
+		console.log("total = " + estimateTotal);
+	}
+
+	return {
+		estimateTotal: estimateTotal,
+		consumedTotal: consumedTotal
+	};
+}
 
 //for export
 var $excel_btn,$excel_dl;
