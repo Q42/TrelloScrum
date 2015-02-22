@@ -819,17 +819,17 @@ function calculateCheckListPoints()
 	var $checkListItem = $('.checklist-list .checklist .checklist-items-list .checklist-item .checklist-item-details .checklist-item-details-text');
 	var estimateTotal = 0;
 	var consumedTotal = 0;
-	for (var i in _pointSeq)
-	{
-		var estimateParsed = $checkListItem.eq(i).text().match(reg);
-		var consumedParsed = $checkListItem.eq(i).text().match(regC);
+
+	$checkListItem.each(function(){
+		var estimateParsed = $(this).text().match(reg);
+		var consumedParsed = $(this).text().match(regC);
 
 		var estimatePoints = estimateParsed?estimateParsed[2]:0;
 		var consumedPoints = consumedParsed?consumedParsed[2]:0;
 
 		estimateTotal += Number(estimatePoints);
 		consumedTotal += Number(consumedPoints);
-	}
+	});
 
 	return {
 		estimateTotal: estimateTotal,
