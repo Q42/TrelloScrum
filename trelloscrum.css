@@ -33,12 +33,13 @@
 	border-bottom-color: #004b5f !important;
 	color: #e1fafb !important;
 	float: right;
-	font-size: 11px;
-	line-height: 16px;
 	text-align: right;
 	background-repeat: no-repeat !important;
 	background-position: 3px 3px !important;
 	padding: 0 4px 0 17px !important;
+	border-radius: 3px;
+	font-size: 12px;
+	line-height: 18px;
 }
 
 .picker-consumed,
