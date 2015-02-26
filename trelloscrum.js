@@ -439,7 +439,7 @@ var ctto;
 function computeTotal(){
 	clearTimeout(ctto);
 	ctto = setTimeout(function(){
-		var $title = $('.board-header-btns.right,#board-header a');
+		var $title = $('.board-header-btns.mod-right,#board-header a');
 		var $total = $title.children('.list-total').empty();
 		if ($total.length == 0)
 			$total = $('<span/>', {class: "list-total"}).appendTo($title);
