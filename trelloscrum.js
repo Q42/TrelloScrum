@@ -208,9 +208,9 @@ function updateBurndownLink(){
 		buttons += "</a>";
 		var showOnLeft = true;
 		if(showOnLeft){
-			$('.board-header-btns.left').last().after(buttons);
+			$('.board-header-btns.mod-left').last().after(buttons);
 		} else {
-			$('.board-header-btns.right,#board-header a').last().after(buttons);
+			$('.board-header-btns.mod-right,#board-header a').last().after(buttons);
 		}
         $('#burndownLink').click(showBurndown);
 		$('#scrumSettingsLink').click(showSettings);
