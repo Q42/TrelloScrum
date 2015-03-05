@@ -128,7 +128,7 @@ $(function(){
 
 // Recalculates every card and its totals (used for significant DOM modifications).
 var recalcListAndTotal = debounce(function($el){
-    ($el||$('.list')).each(function(){
+    ($el||$('.list,.calendar-day')).each(function(){
 		if(!this.list) new List(this);
 		else if(this.list.refreshList){
 			this.list.refreshList(); // make sure each card's points are still accurate (also calls list.calc()).
@@ -150,6 +150,7 @@ var recalcTotalsObserver = new CrossBrowser.MutationObserver(function(mutations)
 		if(! ($target.hasClass('list-total')
 			  || $target.hasClass('list-title')
 			  || $target.hasClass('list-header')
+			  || $target.hasClass('day-header')
 			  || $target.hasClass('date') // the 'time-ago' functionality changes date spans every minute
 			  || $target.hasClass('js-phrase') // this is constantly updated by Trello, but doesn't affect estimates.
               || $target.hasClass('member')
@@ -463,7 +464,7 @@ var lto;
 function calcListPoints(){
 	clearTimeout(lto);
 	lto = setTimeout(function(){
-		$('.list').each(function(){
+		$('.list,.calendar-day').each(function(){
 			if(!this.list) new List(this);
 			else if(this.list.calc) this.list.calc();
 		});
@@ -503,7 +504,7 @@ function List(el){
 		//if(e&&e.target&&!$(e.target).hasClass('list-card')) return; // TODO: REMOVE - What was this? We never pass a param into this function.
 		clearTimeout(to);
 		to = setTimeout(function(){
-			$total.empty().appendTo($list.find('.list-title,.list-header'));
+			$total.empty().appendTo($list.find('.list-title,.list-header,.day-header'));
 			for (var i in _pointsAttr){
 				var score=0,
 					attr = _pointsAttr[i];
@@ -541,6 +542,7 @@ function List(el){
 			if(! ($target.hasClass('list-total')
 					|| $target.hasClass('list-title')
 					|| $target.hasClass('list-header')
+					|| $target.hasClass('day-header')
 					|| $target.hasClass('badge-points')
 					|| $target.hasClass('badges')
 					|| (typeof mutation.target.className == "undefined")
@@ -548,7 +550,7 @@ function List(el){
 			{
 				var list;
 				// It appears this was an actual mutation and not a recursive notification.
-				$list = $target.closest(".list");
+				$list = $target.closest('.list,.calendar-day');
 				if($list.length > 0){
 					list = $list.get(0).list;
 					if(!list){
@@ -608,7 +610,7 @@ function ListCard(el, identifier){
 			if(titleTextContent) el._title = titleTextContent;
 			
 			// Get the stripped-down (parsed) version without the estimates, that was stored after the last change.
-			var parsedTitle = $title.data('parsed-title'); 
+			var parsedTitle = $title.data('parsed-title');
 			if(titleTextContent != parsedTitle){
 				// New card title, so we have to parse this new info to find the new amount of points.
 				parsed=titleTextContent.match(regexp);
@@ -637,7 +639,7 @@ function ListCard(el, identifier){
 				el._title = parsedTitle;
 				$title.data('parsed-title', parsedTitle); // save it to the DOM element so that both badge-types can refer back to it.
 				$title[0].childNodes[1].textContent = parsedTitle;
-				var list = $card.closest('.list');
+				var list = $card.closest('.list,.calendar-day');
 				if(list[0]){
 					list[0].list.calc();
 				}
@@ -657,7 +659,7 @@ function ListCard(el, identifier){
 				$.each(mutation.addedNodes, function(index, node){
 					if($(node).hasClass('card-short-id')){
 						// Found a card-short-id added to the DOM. Need to refresh this card.
-						var listElement = $target.closest('.list').get(0);
+						var listElement = $target.closest('.list,.calendar-day').get(0);
 						if(!listElement.list) new List(listElement); // makes sure the .list in the DOM has a List object
 
 						var $card = $target.closest('.list-card');

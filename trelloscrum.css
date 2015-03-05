@@ -6,6 +6,10 @@
 	margin: 1px 0px 0 0;
 	line-height:18px;
 }
+.day-header .list-total {
+	position: absolute;
+	right: 8px;
+}
 .board-header-btns .list-total{ /* only targets the board totals */
 	line-height:30px;
 	color: #60c5f0;
