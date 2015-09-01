@@ -604,7 +604,7 @@ function ListCard(el, identifier){
 		to = setTimeout(function(){
 			var $title=$card.find('a.list-card-title');
 			if(!$title[0])return;
-			var titleTextContent = $title[0].childNodes[1].textContent;
+			var titleTextContent = $title[0].textContent;
 			if(titleTextContent) el._title = titleTextContent;
 			
 			// Get the stripped-down (parsed) version without the estimates, that was stored after the last change.
@@ -636,7 +636,7 @@ function ListCard(el, identifier){
 				parsedTitle = $.trim(el._title.replace(reg,'$1').replace(regC,'$1'));
 				el._title = parsedTitle;
 				$title.data('parsed-title', parsedTitle); // save it to the DOM element so that both badge-types can refer back to it.
-				$title[0].childNodes[1].textContent = parsedTitle;
+				$title[0].textContent = parsedTitle;
 				var list = $card.closest('.list');
 				if(list[0]){
 					list[0].list.calc();
