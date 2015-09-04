@@ -138,6 +138,7 @@ var recalcListAndTotal = debounce(function($el){
 
 var recalcTotalsObserver = new CrossBrowser.MutationObserver(function(mutations)
 {	
+    console.log('recalcOberser called', mutations);
 	// Determine if the mutation event included an ACTUAL change to the list rather than
 	// a modification caused by this extension making an update to points, etc. (prevents
 	// infinite recursion).
@@ -168,6 +169,7 @@ var recalcTotalsObserver = new CrossBrowser.MutationObserver(function(mutations)
 				doFullRefresh = true;
 			}
 		}
+
 	});
 	
 	if(doFullRefresh){
@@ -176,10 +178,18 @@ var recalcTotalsObserver = new CrossBrowser.MutationObserver(function(mutations)
 		calcListPoints();
 	}
     
-    $editControls = $(".card-detail-title .edit-controls");
+    var $editControls = $(".card-detail-title .edit-controls");
+    var $checklistEditControls = $('.checklist-item-details .edit-controls');
+    
     if($editControls.length > 0)
     {
         showPointPicker($editControls.get(0));
+    }
+
+    if($checklistEditControls.length > 0)
+    {
+        showPointPickerChecklist($checklistEditControls.get(0));
+
     }
 });
 recalcTotalsObserver.observe(document.body, obsConfig);
@@ -696,7 +706,7 @@ function showPointPicker(location) {
 	if($(location).find('.picker').length) return;
 	var $picker = $('<div/>', {class: "picker"}).appendTo('.card-detail-title .edit-controls');
 	$picker.append($('<span>', {class: "picker-title"}).text("Estimated Points"));
-	
+
 	var estimateSequence = (S4T_SETTINGS[SETTING_NAME_ESTIMATES].replace(/ /g, '')).split(',');
 	for (var i in estimateSequence) $picker.append($('<span>', {class: "point-value"}).text(estimateSequence[i]).click(function(){
 		var value = $(this).text();
@@ -732,6 +742,105 @@ function showPointPicker(location) {
 	}))
 };
 
+//the story point picker for checklist
+function showPointPickerChecklist(location) {
+	var $parent = $(location).parent();
+	if($(location).find('.picker').length) return;
+	var $picker = $('<div/>', {class: "picker"}).appendTo('.checklist-item-details .edit-controls');
+	$picker.append($('<span>', {class: "picker-title"}).text("Estimated Points"));
+
+	var estimateSequence = (S4T_SETTINGS[SETTING_NAME_ESTIMATES]).split(',');
+	for (var i in estimateSequence) $picker.append($('<span>', {class: "point-value"}).text(estimateSequence[i]).click(function(){
+		var value = $(this).text();
+		// use our parent element to locate the inner textarea
+		var $text = $parent.find('textarea');
+		var text = $text.val();
+
+		// replace our new
+		$text[0].value=text.match(reg)?text.replace(reg, '('+value+') '):'('+value+') ' + text;
+
+		// then click our button so it all gets saved away
+		$(".checklist-item-details .edit .js-save-edit").click();
+
+		// updates points of a card based on all checklists items
+		updateCardTitle();
+
+		return false
+	}))
+
+	var $parent = $(location).parent();
+	if($(location).find('.picker-consumed').length) return;
+	var $picker = $('<div/>', {class: "picker-consumed"}).appendTo('.checklist-item-details .edit-controls');
+	$picker.append($('<span>', {class: "picker-title"}).text("Consumed Points"));
+
+	var consumedSequence = (S4T_SETTINGS[SETTING_NAME_ESTIMATES]).split(',');
+	for (var i in consumedSequence) $picker.append($('<span>', {class: "point-value"}).text(consumedSequence[i]).click(function(){
+		var value = $(this).text();
+		// use our parent element to locate the inner textarea
+		var $text = $parent.find('textarea');
+		var text = $text.val();
+
+		// replace our new
+		$text[0].value=text.match(regC)?text.replace(regC, ' ['+value+']'):text + ' ['+value+']';
+
+		// then click our button so it all gets saved away
+		$(".checklist-item-details .edit .js-save-edit").click();
+
+		// updates points of a card based on all checklists items
+		updateCardTitle();
+
+		return false
+	}))
+};
+
+function updateCardTitle()
+{
+	// timeout to allow enough time for checklist item title to update
+	setTimeout(function() {
+		var $currentTitle = $('.window-title .window-title-text');
+		var titleText = $currentTitle.text();
+		var $title = $('.card-detail-title .edit textarea');
+		$(".card-detail-title").addClass("editing");
+
+		var totals = calculateCheckListPoints();
+		var newTitleValue = titleText.match(reg)?titleText.replace(reg, '('+totals.estimateTotal+') '):'('+totals.estimateTotal+') ' + titleText;
+		newTitleValue = newTitleValue.match(regC)?newTitleValue.replace(regC, ' ['+totals.consumedTotal+']'):newTitleValue + ' ['+totals.consumedTotal+']';
+		$title[0].value = newTitleValue;
+
+		// add edit button to card title edit controls
+		$('<div/>', {class: "edit-controls clearfix"}).appendTo('.card-detail-title .edit');
+		$('<input/>', {class: "primary confirm js-save-edit", value: "Save"}).appendTo('.card-detail-title .edit-controls');
+
+		// then click our button so it all gets saved away
+		$(".card-detail-title .edit .js-save-edit").click();
+
+	}, 500);
+
+	return true;
+}
+
+function calculateCheckListPoints()
+{
+	var $checkListItem = $('.checklist-list .checklist .checklist-items-list .checklist-item .checklist-item-details .checklist-item-details-text');
+	var estimateTotal = 0;
+	var consumedTotal = 0;
+
+	$checkListItem.each(function(){
+		var estimateParsed = $(this).text().match(reg);
+		var consumedParsed = $(this).text().match(regC);
+
+		var estimatePoints = estimateParsed?estimateParsed[2]:0;
+		var consumedPoints = consumedParsed?consumedParsed[2]:0;
+
+		estimateTotal += Number(estimatePoints);
+		consumedTotal += Number(consumedPoints);
+	});
+
+	return {
+		estimateTotal: estimateTotal,
+		consumedTotal: consumedTotal
+	};
+}
 
 //for export
 var $excel_btn,$excel_dl;
