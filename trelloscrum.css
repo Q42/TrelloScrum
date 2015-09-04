@@ -73,12 +73,13 @@
 }
 
 .badge-points:empty {
-	display: none;
+	display: none !important;
 }
 
 .badge-points.consumed{
 	opacity: 0.5;
 }
+.badge:empty{ display:none !important; }
 
 /* == b4t integration==*/
 #burndownLink .icon-sm{
