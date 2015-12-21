@@ -117,9 +117,12 @@ $(function(){
 	function updateFilters() {
 		setTimeout(calcListPoints);
 	};
-	$('.js-toggle-label-filter, .js-select-member, .js-due-filter, .js-clear-all').live('mouseup', calcListPoints);
-	$('.js-input').live('keyup', calcListPoints);
-	$('.js-share').live('mouseup',function(){
+	$('.js-toggle-label-filter, .js-select-member, .js-due-filter, .js-clear-all').off('mouseup');
+	$('.js-toggle-label-filter, .js-select-member, .js-due-filter, .js-clear-all').on('mouseup', calcListPoints);
+	$('.js-input').off('keyup');
+	$('.js-input').on('keyup', calcListPoints);
+	$('.js-share').off('mouseup');
+	$('.js-share').on('mouseup',function(){
 		setTimeout(checkExport,500)
 	});
 
@@ -137,7 +140,7 @@ var recalcListAndTotal = debounce(function($el){
 }, 500, false);
 
 var recalcTotalsObserver = new CrossBrowser.MutationObserver(function(mutations)
-{	
+{
 	// Determine if the mutation event included an ACTUAL change to the list rather than
 	// a modification caused by this extension making an update to points, etc. (prevents
 	// infinite recursion).
