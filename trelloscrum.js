@@ -63,6 +63,7 @@ var reg = /((?:^|\s))\((\x3f|\d*\.?\d+)(\))\s?/m, //parse regexp- accepts digits
     iconUrl, pointsDoneUrl,
 	flameUrl, flame18Url,
 	scrumLogoUrl, scrumLogo18Url;
+// FIREFOX_BEGIN_REMOVE
 if(typeof chrome !== 'undefined'){
     // Works in Chrome
 	iconUrl = chrome.extension.getURL('images/storypoints-icon.png');
@@ -81,6 +82,7 @@ if(typeof chrome !== 'undefined'){
 	scrumLogo18Url = safari.extension.baseURI + 'images/trello-scrum-icon_18x18.png';
 } else {
 	// Works in Firefox Add-On
+	// FIREFOX_END_REMOVE
 	if(typeof self.options != 'undefined'){ // options defined in main.js
 		iconUrl = self.options.iconUrl;
 		pointsDoneUrl = self.options.pointsDoneUrl;
@@ -89,7 +91,10 @@ if(typeof chrome !== 'undefined'){
 		scrumLogoUrl = self.options.scrumLogoUrl;
 		scrumLogo18Url = self.options.scrumLogo18Url;
 	}
-}
+	
+	// FIREFOX_BEGIN_REMOVE (will just remove this closing bracket).
+} // FIREFOX_END_REMOVE
+
 function round(_val) {return (Math.round(_val * 100) / 100)};
 
 // Comment out before release - makes cross-browser debugging easier.
@@ -258,10 +263,10 @@ function showBurndown()
 	$windowWrapper.empty().append(clearfix).append(flameIcon).append(windowHeaderUtils).append(iFrameWrapper);
 	$('#burndownFrame').load(function(){ $('#loadingBurndownFrame').remove(); actualIFrame.css("visibility", "visible"); }); // once the iframe loads, get rid of the loading indicator.
 	$('.window-header-utils a.js-close-window').click(hideBurndown);
-    $(window).bind('resize', repositionBurndown);
+    //$(window).bind('resize', repositionBurndown);
     $('.window-overlay').bind('click', hideBurndown);
     
-    repositionBurndown();
+    //repositionBurndown();
 }
 
 var settingsFrameId = 'settingsFrame';
@@ -405,25 +410,26 @@ function showSettings()
 	iframeObj.attr('src', "about:blank"); // need to set this AFTER the .load() has been registered.
 	
 	$('.window-header-utils a.js-close-window').click(hideBurndown);
-    $(window).bind('resize', repositionBurndown);
+    //$(window).bind('resize', repositionBurndown);
     $('.window-overlay').bind('click', hideBurndown);
 
-	repositionBurndown();
+	//repositionBurndown();
 }
 
 function hideBurndown()
 {
     $('body').removeClass("window-up");
     $('.window').css("display", "none");
-    $(window).unbind('resize', repositionBurndown);
+    //$(window).unbind('resize', repositionBurndown);
 	$('.window-header-utils a.js-close-window').unbind('click', hideBurndown);
 	$('.window-wrapper').unbind('click', ignoreClicks);
     $('.window-overlay').unbind('click', hideBurndown);
 }
 
-function repositionBurndown()
-{
-    // NOTE: With the most recent Trello update, I don't think we have to position the window manually anymore.
+// NOTE: With the most recent Trello update, I don't think we have to position the window manually anymore.
+// If that changes, restore the function AND uncomment the calls to it.
+//function repositionBurndown()
+//{
     //windowWidth = $(window).width();
     //if(windowWidth < 0) // todo change this to a n actual number (probably 710 or so)
     //{
@@ -435,7 +441,7 @@ function repositionBurndown()
     //    leftPadding = (windowWidth - burndownWindowWidth) / 2.0;
     //    $('.window').css("left", leftPadding);
     //}
-}
+//}
 
 //calculate board totals
 var ctto;
