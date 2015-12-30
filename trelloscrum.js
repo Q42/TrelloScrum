@@ -59,7 +59,7 @@ refreshSettings(); // get the settings right away (may take a little bit if usin
 
 //internals
 var reg = /((?:^|\s))\((\x3f|\d*\.?\d+)(\))\s?/m, //parse regexp- accepts digits, decimals and '?', surrounded by ()
-    regC = /((?:^|\s))\[(\x3f|\d*\.?\d+)(\])\s?/m, //parse regexp- accepts digits, decimals and '?', surrounded by []
+    regC = /((?:^|\s))\[(\x3f|-?\d*\.?\d+)(\])\s?/m, //parse regexp- accepts digits, decimals and '?', surrounded by []
     iconUrl, pointsDoneUrl,
 	flameUrl, flame18Url,
 	scrumLogoUrl, scrumLogo18Url;
