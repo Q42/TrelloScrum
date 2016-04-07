@@ -610,15 +610,17 @@ function ListCard(el, identifier){
 		if(busy) return;
 		busy = true;
 		clearTimeout(to);
+
 		to = setTimeout(function(){
 			var $title=$card.find('a.list-card-title');
 			if(!$title[0])return;
 			// This expression gets the right value whether Trello has the card-number span in the DOM or not (they recently removed it and added it back).
-			var titleTextContent = (($title[0].childNodes.length > 1) ? $title[0].childNodes[1].textContent : $title[0].textContent);
+			var titleTextContent = (($title[0].childNodes.length > 1) ? $title[0].childNodes[$title[0].childNodes.length-1].textContent : $title[0].textContent);
 			if(titleTextContent) el._title = titleTextContent;
 			
 			// Get the stripped-down (parsed) version without the estimates, that was stored after the last change.
 			var parsedTitle = $title.data('parsed-title'); 
+
 			if(titleTextContent != parsedTitle){
 				// New card title, so we have to parse this new info to find the new amount of points.
 				parsed=titleTextContent.match(regexp);
@@ -647,7 +649,7 @@ function ListCard(el, identifier){
 				el._title = parsedTitle;
 				$title.data('parsed-title', parsedTitle); // save it to the DOM element so that both badge-types can refer back to it.
 				if($title[0].childNodes.length > 1){
-					$title[0].childNodes[1].textContent = parsedTitle; // if they keep the card numbers in the DOM
+					$title[0].childNodes[$title[0].childNodes.length-1].textContent = parsedTitle; // if they keep the card numbers in the DOM
 				} else {
 					$title[0].textContent = parsedTitle; // if they yank the card numbers out of the DOM again.
 				}
