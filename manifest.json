@@ -1,11 +1,11 @@
 {
 	"name": "Scrum for Trello",
-	"version": "1.94",
+	"version": "1.97",
 	"description": "Adds Scrum to your Trello",
 	"content_scripts": [
 		{
 			"matches": ["https://trello.com/*"],
-			"js": ["jquery-1.7.1.min.js","trelloscrum.js"],
+			"js": ["jquery-2.1.4.min.js","trelloscrum.js"],
 			"css": ["trelloscrum.css"]
 		}
 	],

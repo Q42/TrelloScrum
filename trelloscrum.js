@@ -58,11 +58,12 @@ S4T_SETTING_DEFAULTS[SETTING_NAME_ESTIMATES] = _pointSeq.join();
 refreshSettings(); // get the settings right away (may take a little bit if using Chrome cloud storage)
 
 //internals
-var reg = /((?:^|\s))\((\x3f|\d*\.?\d+)(\))\s?/m, //parse regexp- accepts digits, decimals and '?', surrounded by ()
-    regC = /((?:^|\s))\[(\x3f|\d*\.?\d+)(\])\s?/m, //parse regexp- accepts digits, decimals and '?', surrounded by []
+var reg = /((?:^|\s?))\((\x3f|\d*\.?\d+)(\))\s?/m, //parse regexp- accepts digits, decimals and '?', surrounded by ()
+    regC = /((?:^|\s?))\[(\x3f|\d*\.?\d+)(\])\s?/m, //parse regexp- accepts digits, decimals and '?', surrounded by []
     iconUrl, pointsDoneUrl,
 	flameUrl, flame18Url,
 	scrumLogoUrl, scrumLogo18Url;
+// FIREFOX_BEGIN_REMOVE
 if(typeof chrome !== 'undefined'){
     // Works in Chrome
 	iconUrl = chrome.extension.getURL('images/storypoints-icon.png');
@@ -81,6 +82,7 @@ if(typeof chrome !== 'undefined'){
 	scrumLogo18Url = safari.extension.baseURI + 'images/trello-scrum-icon_18x18.png';
 } else {
 	// Works in Firefox Add-On
+	// FIREFOX_END_REMOVE
 	if(typeof self.options != 'undefined'){ // options defined in main.js
 		iconUrl = self.options.iconUrl;
 		pointsDoneUrl = self.options.pointsDoneUrl;
@@ -89,7 +91,10 @@ if(typeof chrome !== 'undefined'){
 		scrumLogoUrl = self.options.scrumLogoUrl;
 		scrumLogo18Url = self.options.scrumLogo18Url;
 	}
-}
+	
+	// FIREFOX_BEGIN_REMOVE (will just remove this closing bracket).
+} // FIREFOX_END_REMOVE
+
 function round(_val) {return (Math.round(_val * 100) / 100)};
 
 // Comment out before release - makes cross-browser debugging easier.
@@ -117,9 +122,12 @@ $(function(){
 	function updateFilters() {
 		setTimeout(calcListPoints);
 	};
-	$('.js-toggle-label-filter, .js-select-member, .js-due-filter, .js-clear-all').live('mouseup', calcListPoints);
-	$('.js-input').live('keyup', calcListPoints);
-	$('.js-share').live('mouseup',function(){
+	$('.js-toggle-label-filter, .js-select-member, .js-due-filter, .js-clear-all').off('mouseup');
+	$('.js-toggle-label-filter, .js-select-member, .js-due-filter, .js-clear-all').on('mouseup', calcListPoints);
+	$('.js-input').off('keyup');
+	$('.js-input').on('keyup', calcListPoints);
+	$('.js-share').off('mouseup');
+	$('.js-share').on('mouseup',function(){
 		setTimeout(checkExport,500)
 	});
 
@@ -137,7 +145,7 @@ var recalcListAndTotal = debounce(function($el){
 }, 500, false);
 
 var recalcTotalsObserver = new CrossBrowser.MutationObserver(function(mutations)
-{	
+{
 	// Determine if the mutation event included an ACTUAL change to the list rather than
 	// a modification caused by this extension making an update to points, etc. (prevents
 	// infinite recursion).
@@ -255,10 +263,10 @@ function showBurndown()
 	$windowWrapper.empty().append(clearfix).append(flameIcon).append(windowHeaderUtils).append(iFrameWrapper);
 	$('#burndownFrame').load(function(){ $('#loadingBurndownFrame').remove(); actualIFrame.css("visibility", "visible"); }); // once the iframe loads, get rid of the loading indicator.
 	$('.window-header-utils a.js-close-window').click(hideBurndown);
-    $(window).bind('resize', repositionBurndown);
+    //$(window).bind('resize', repositionBurndown);
     $('.window-overlay').bind('click', hideBurndown);
     
-    repositionBurndown();
+    //repositionBurndown();
 }
 
 var settingsFrameId = 'settingsFrame';
@@ -402,25 +410,26 @@ function showSettings()
 	iframeObj.attr('src', "about:blank"); // need to set this AFTER the .load() has been registered.
 	
 	$('.window-header-utils a.js-close-window').click(hideBurndown);
-    $(window).bind('resize', repositionBurndown);
+    //$(window).bind('resize', repositionBurndown);
     $('.window-overlay').bind('click', hideBurndown);
 
-	repositionBurndown();
+	//repositionBurndown();
 }
 
 function hideBurndown()
 {
     $('body').removeClass("window-up");
     $('.window').css("display", "none");
-    $(window).unbind('resize', repositionBurndown);
+    //$(window).unbind('resize', repositionBurndown);
 	$('.window-header-utils a.js-close-window').unbind('click', hideBurndown);
 	$('.window-wrapper').unbind('click', ignoreClicks);
     $('.window-overlay').unbind('click', hideBurndown);
 }
 
-function repositionBurndown()
-{
-    // NOTE: With the most recent Trello update, I don't think we have to position the window manually anymore.
+// NOTE: With the most recent Trello update, I don't think we have to position the window manually anymore.
+// If that changes, restore the function AND uncomment the calls to it.
+//function repositionBurndown()
+//{
     //windowWidth = $(window).width();
     //if(windowWidth < 0) // todo change this to a n actual number (probably 710 or so)
     //{
@@ -432,7 +441,7 @@ function repositionBurndown()
     //    leftPadding = (windowWidth - burndownWindowWidth) / 2.0;
     //    $('.window').css("left", leftPadding);
     //}
-}
+//}
 
 //calculate board totals
 var ctto;
@@ -601,15 +610,17 @@ function ListCard(el, identifier){
 		if(busy) return;
 		busy = true;
 		clearTimeout(to);
+
 		to = setTimeout(function(){
 			var $title=$card.find('a.list-card-title');
 			if(!$title[0])return;
 			// This expression gets the right value whether Trello has the card-number span in the DOM or not (they recently removed it and added it back).
-			var titleTextContent = (($title[0].childNodes.length > 1) ? $title[0].childNodes[1].textContent : $title[0].textContent);
+			var titleTextContent = (($title[0].childNodes.length > 1) ? $title[0].childNodes[$title[0].childNodes.length-1].textContent : $title[0].textContent);
 			if(titleTextContent) el._title = titleTextContent;
 			
 			// Get the stripped-down (parsed) version without the estimates, that was stored after the last change.
 			var parsedTitle = $title.data('parsed-title'); 
+
 			if(titleTextContent != parsedTitle){
 				// New card title, so we have to parse this new info to find the new amount of points.
 				parsed=titleTextContent.match(regexp);
@@ -638,7 +649,7 @@ function ListCard(el, identifier){
 				el._title = parsedTitle;
 				$title.data('parsed-title', parsedTitle); // save it to the DOM element so that both badge-types can refer back to it.
 				if($title[0].childNodes.length > 1){
-					$title[0].childNodes[1].textContent = parsedTitle; // if they keep the card numbers in the DOM
+					$title[0].childNodes[$title[0].childNodes.length-1].textContent = parsedTitle; // if they keep the card numbers in the DOM
 				} else {
 					$title[0].textContent = parsedTitle; // if they yank the card numbers out of the DOM again.
 				}
