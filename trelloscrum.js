@@ -184,7 +184,12 @@ var recalcTotalsObserver = new CrossBrowser.MutationObserver(function(mutations)
 		calcListPoints();
 	}
     
-    $editControls = $(".card-detail-title .edit-controls");
+	// There appears to be a change to have the card-title always be a textarea. We'll allow for either way, to
+	// start (in case this is A/B testing, or they don't keep it). 20160409
+    $editControls = $(".card-detail-title .edit-controls"); // old selector
+	if($editControls.length == 0){
+		$editControls = $(".js-card-detail-title-input.is-editing").closest('.window-header'); // new selector
+	}
     if($editControls.length > 0)
     {
         showPointPicker($editControls.get(0));
@@ -705,42 +710,55 @@ function ListCard(el, identifier){
 //the story point picker
 function showPointPicker(location) {
 	if($(location).find('.picker').length) return;
-	var $picker = $('<div/>', {class: "picker"}).appendTo('.card-detail-title .edit-controls');
+	
+	// Try to allow this to work with old card style (with save button) or new style (where title is always a textarea).
+	var $elementToAddPickerTo = $('.card-detail-title .edit-controls');
+	if($elementToAddPickerTo.length == 0){
+		$elementToAddPickerTo = $(".js-card-detail-title-input").closest('.window-header');
+	}
+
+	var $picker = $('<div/>', {class: "picker"}).appendTo($elementToAddPickerTo.get(0));
 	$picker.append($('<span>', {class: "picker-title"}).text("Estimated Points"));
 	
 	var estimateSequence = (S4T_SETTINGS[SETTING_NAME_ESTIMATES].replace(/ /g, '')).split(',');
 	for (var i in estimateSequence) $picker.append($('<span>', {class: "point-value"}).text(estimateSequence[i]).click(function(){
 		var value = $(this).text();
-		var $text = $('.card-detail-title .edit textarea');
+		var $text = $('.card-detail-title .edit textarea'); // old text-areas
+		if($text.length == 0){
+			$text = $('textarea.js-card-detail-title-input'); // new text-area
+		}
 		var text = $text.val();
 
-		// replace our new
+		// replace estimates in card title
 		$text[0].value=text.match(reg)?text.replace(reg, '('+value+') '):'('+value+') ' + text;
 
 		// then click our button so it all gets saved away
 		$(".card-detail-title .edit .js-save-edit").click();
 
-		return false
-	}))
+		return false;
+	}));
 	
 	if($(location).find('.picker-consumed').length) return;
-	var $pickerConsumed = $('<div/>', {class: "picker-consumed"}).appendTo('.card-detail-title .edit-controls');
+	var $pickerConsumed = $('<div/>', {class: "picker-consumed"}).appendTo($elementToAddPickerTo.get(0));
 	$pickerConsumed.append($('<span>', {class: "picker-title"}).text("Consumed Points"));
 
 	var consumedSequence = (S4T_SETTINGS[SETTING_NAME_ESTIMATES]).split(',');
 	for (var i in consumedSequence) $pickerConsumed.append($('<span>', {class: "point-value"}).text(consumedSequence[i]).click(function(){
 		var value = $(this).text();
-		var $text = $('.card-detail-title .edit textarea');
+		var $text = $('.card-detail-title .edit textarea'); // old text-areas
+		if($text.length == 0){
+			$text = $('textarea.js-card-detail-title-input'); // new text-area
+		}
 		var text = $text.val();
 
-		// replace our new
+		// replace consumed value in card title
 		$text[0].value=text.match(regC)?text.replace(regC, ' ['+value+']'):text + ' ['+value+']';
 
 		// then click our button so it all gets saved away
 		$(".card-detail-title .edit .js-save-edit").click();
 
-		return false
-	}))
+		return false;
+	}));
 };
 
 
