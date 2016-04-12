@@ -10,6 +10,8 @@
 	line-height:18px;
 }
 .board-header-btns .list-total{ /* only targets the board totals */
+	position: static;
+	margin-right: 8px;
 	line-height:30px;
 	color: #60c5f0;
 }
