@@ -255,7 +255,7 @@ function showBurndown()
     var flameIcon = $('<img/>', {style: 'position:absolute; margin-left: 20px; margin-top:15px;', src:flame18Url});
     
 	var actualIFrame = $('<iframe/>', {frameborder: '0',
-						 style: 'width: 670px; height: 512px;',
+						 style: 'width: 691px; height: 820px;',
 						 id: 'burndownFrame',
 						 src: "https://www.burndownfortrello.com/s4t_burndownPopup.php?username="+encodeURIComponent(username)+"&shortLink="+encodeURIComponent(shortLink)+"&boardName="+encodeURIComponent(boardName)
 						});
