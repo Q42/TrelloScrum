@@ -492,8 +492,7 @@ function List(el){
 	var $list=$(el),
 		$total=$('<span class="list-total">'),
 		busy = false,
-		to,
-		to2;
+		to;
 
 	function readCard($c){
 		if($c.target) {
@@ -501,10 +500,13 @@ function List(el){
 			$c = $($c.target).filter('.list-card:not(.placeholder)');
 		}
 		$c.each(function(){
-			if(!this.listCard) for (var i in _pointsAttr)
+			if(!this.listCard) for (var i in _pointsAttr){
 				new ListCard(this,_pointsAttr[i]);
-			else for (var i in _pointsAttr)
-				setTimeout(this.listCard[_pointsAttr[i]].refresh);
+			} else {
+				for (var i in _pointsAttr){
+					setTimeout(this.listCard[_pointsAttr[i]].refresh);
+				}
+			}
 		});
 	};
 
@@ -539,8 +541,8 @@ function List(el){
 	};
     
     this.refreshList = debounce(function(){
-    		readCard($list.find('.list-card:not(.placeholder)'));
-            this.calc(); // readCard will call this.calc() if any of the cards get refreshed.
+        readCard($list.find('.list-card:not(.placeholder)'));
+        this.calc(); // readCard will call this.calc() if any of the cards get refreshed.
     }, 500, false);
 
 	var cardAddedRemovedObserver = new CrossBrowser.MutationObserver(function(mutations)
@@ -617,7 +619,7 @@ function ListCard(el, identifier){
 		clearTimeout(to);
 
 		to = setTimeout(function(){
-			var $title=$card.find('a.list-card-title');
+			var $title=$card.find('.list-card-title');
 			if(!$title[0])return;
 			// This expression gets the right value whether Trello has the card-number span in the DOM or not (they recently removed it and added it back).
 			var titleTextContent = (($title[0].childNodes.length > 1) ? $title[0].childNodes[$title[0].childNodes.length-1].textContent : $title[0].textContent);
