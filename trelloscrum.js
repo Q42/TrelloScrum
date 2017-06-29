@@ -619,7 +619,7 @@ function ListCard(el, identifier){
 		clearTimeout(to);
 
 		to = setTimeout(function(){
-			var $title=$card.find('.list-card-title');
+			var $title=$card.find('.js-card-name');
 			if(!$title[0])return;
 			// This expression gets the right value whether Trello has the card-number span in the DOM or not (they recently removed it and added it back).
 			var titleTextContent = (($title[0].childNodes.length > 1) ? $title[0].childNodes[$title[0].childNodes.length-1].textContent : $title[0].textContent);
