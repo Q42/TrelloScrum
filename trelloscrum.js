@@ -762,7 +762,7 @@ function showPointPicker(location) {
 
 //for export
 var $excel_btn,$excel_dl;
-window.URL = window.webkitURL || window.URL;
+window.URL = window.URL || window.webkitURL;
 
 function checkExport() {
 	if($excel_btn && $excel_btn.filter(':visible').length) return;
