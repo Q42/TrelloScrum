@@ -55,7 +55,6 @@ var S4T_ALL_SETTINGS = [SETTING_NAME_LINK_STYLE, SETTING_NAME_ESTIMATES];
 var S4T_SETTING_DEFAULTS = {};
 S4T_SETTING_DEFAULTS[SETTING_NAME_LINK_STYLE] = 'full';
 S4T_SETTING_DEFAULTS[SETTING_NAME_ESTIMATES] = _pointSeq.join();
-refreshSettings(); // get the settings right away (may take a little bit if using Chrome cloud storage)
 
 //internals
 var reg = /((?:^|\s?))\((\x3f|\d*\.?\d+)(\))\s?/m, //parse regexp- accepts digits, decimals and '?', surrounded by ()
@@ -65,13 +64,15 @@ var reg = /((?:^|\s?))\((\x3f|\d*\.?\d+)(\))\s?/m, //parse regexp- accepts digit
 	scrumLogoUrl, scrumLogo18Url;
 // FIREFOX_BEGIN_REMOVE
 if(typeof chrome !== 'undefined'){
-    // Works in Chrome
+    // Works in Chrome & FF 57.
+    // FIREFOX_END_REMOVE
 	iconUrl = chrome.extension.getURL('images/storypoints-icon.png');
 	pointsDoneUrl = chrome.extension.getURL('images/points-done.png');
     flameUrl = chrome.extension.getURL('images/burndown_for_trello_icon_12x12.png');
     flame18Url = chrome.extension.getURL('images/burndown_for_trello_icon_18x18.png');
 	scrumLogoUrl = chrome.extension.getURL('images/trello-scrum-icon_12x12.png');
 	scrumLogo18Url = chrome.extension.getURL('images/trello-scrum-icon_18x18.png');
+	// FIREFOX_BEGIN_REMOVE - This is for firefox review requirements. We can't have code that doesn't run in FF.
 } else if(navigator.userAgent.indexOf('Safari') != -1){ // Chrome defines both "Chrome" and "Safari", so this test MUST be done after testing for Chrome
 	// Works in Safari
 	iconUrl = safari.extension.baseURI + 'images/storypoints-icon.png';
@@ -80,20 +81,9 @@ if(typeof chrome !== 'undefined'){
     flame18Url = safari.extension.baseURI + 'images/burndown_for_trello_icon_18x18.png';
 	scrumLogoUrl = safari.extension.baseURI + 'images/trello-scrum-icon_12x12.png';
 	scrumLogo18Url = safari.extension.baseURI + 'images/trello-scrum-icon_18x18.png';
-} else {
-	// Works in Firefox Add-On
-	// FIREFOX_END_REMOVE
-	if(typeof self.options != 'undefined'){ // options defined in main.js
-		iconUrl = self.options.iconUrl;
-		pointsDoneUrl = self.options.pointsDoneUrl;
-        flameUrl = self.options.flameUrl;
-        flame18Url = self.options.flame18Url;
-		scrumLogoUrl = self.options.scrumLogoUrl;
-		scrumLogo18Url = self.options.scrumLogo18Url;
-	}
-	
-	// FIREFOX_BEGIN_REMOVE (will just remove this closing bracket).
 } // FIREFOX_END_REMOVE
+
+refreshSettings(); // get the settings right away (may take a little bit if using Chrome cloud storage)
 
 function round(_val) {return (Math.round(_val * 100) / 100)};
 
