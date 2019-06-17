@@ -227,10 +227,7 @@ function showBurndown()
     $('.window').css("display", "block").css("top", "50px");
 
 	// Figure out the current user and board.
-	$memberObj = $('.header-user .member-avatar');
-	if($memberObj.length == 0){
-		$memberObj = $('.header-user .member-initials'); // if the user doesn't have an icon
-	}
+	$memberObj = $('.js-open-header-member-menu>div');
 	var username = $memberObj.attr('title').match(/\(([^\)\(]*?)\)$/)[1];
 
 	// Find the short-link board name, etc. so that the back-end can figure out what board this is.
