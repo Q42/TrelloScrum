@@ -1,4 +1,7 @@
 .list-total {
+	position: absolute;
+	right: 32px;
+	top: 6px;
 	color: #006580;
 	font-size: 16px;
 	font-weight: bold;
@@ -7,6 +10,8 @@
 	line-height:18px;
 }
 .board-header-btns .list-total{ /* only targets the board totals */
+	position: static;
+	margin-right: 8px;
 	line-height:30px;
 	color: #60c5f0;
 }
