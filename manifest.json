@@ -1,7 +1,7 @@
 {
 	"name": "Scrum for Trello",
-	"version": "1.103",
-	"description": "Adds Scrum to your Trello",
+	"version": "1.105",
+	"description": "Adds Scrum story points to your Trello",
 	"content_scripts": [
 		{
 			"matches": ["https://trello.com/*"],
@@ -9,16 +9,21 @@
 			"css": ["trelloscrum.css"]
 		}
 	],
-	"manifest_version" : 2,
+	"manifest_version" : 3,
     "icons": { "128": "trello-scrum-icon.png" },
     "web_accessible_resources": [
-	    "images/storypoints-icon.png",
-	    "images/points-done.png",
-		"images/burndown_for_trello_icon_12x12.png",
-		"images/burndown_for_trello_icon_18x18.png",
-		"images/trello-scrum-icon_12x12.png",
-		"images/trello-scrum-icon_18x18.png"
-    ],
+		{
+		"resources": [
+				"images/storypoints-icon.png",
+				"/images/points-done.png",
+				"/images/burndown_for_trello_icon_12x12.png",
+				"/images/burndown_for_trello_icon_18x18.png",
+				"/images/trello-scrum-icon_12x12.png",
+				"/images/trello-scrum-icon_18x18.png"
+			],
+		"matches": ["<all_urls>"]
+		}
+	],
 	"permissions": [
 		"storage"
 	]

@@ -66,12 +66,12 @@ var reg = /((?:^|\s?))\((\x3f|\d*\.?\d+)(\))\s?/m, //parse regexp- accepts digit
 if(typeof chrome !== 'undefined'){
     // Works in Chrome & FF 57.
     // FIREFOX_END_REMOVE
-	iconUrl = chrome.extension.getURL('images/storypoints-icon.png');
-	pointsDoneUrl = chrome.extension.getURL('images/points-done.png');
-    flameUrl = chrome.extension.getURL('images/burndown_for_trello_icon_12x12.png');
-    flame18Url = chrome.extension.getURL('images/burndown_for_trello_icon_18x18.png');
-	scrumLogoUrl = chrome.extension.getURL('images/trello-scrum-icon_12x12.png');
-	scrumLogo18Url = chrome.extension.getURL('images/trello-scrum-icon_18x18.png');
+	iconUrl = chrome.runtime.getURL('images/storypoints-icon.png');
+	pointsDoneUrl = chrome.runtime.getURL('images/points-done.png');
+    flameUrl = chrome.runtime.getURL('images/burndown_for_trello_icon_12x12.png');
+    flame18Url = chrome.runtime.getURL('images/burndown_for_trello_icon_18x18.png');
+	scrumLogoUrl = chrome.runtime.getURL('images/trello-scrum-icon_12x12.png');
+	scrumLogo18Url = chrome.runtime.getURL('images/trello-scrum-icon_18x18.png');
 	// FIREFOX_BEGIN_REMOVE - This is for firefox review requirements. We can't have code that doesn't run in FF.
 } else if(navigator.userAgent.indexOf('Safari') != -1){ // Chrome defines both "Chrome" and "Safari", so this test MUST be done after testing for Chrome
 	// Works in Safari
