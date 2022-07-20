@@ -181,6 +181,10 @@ var recalcTotalsObserver = new CrossBrowser.MutationObserver(function(mutations)
 	if($editControls.length == 0){
 		$editControls = $(".js-card-detail-title-input.is-editing").closest('.window-header'); // new selector
 	}
+	if($editControls.length == 0){
+		$editControls = $(".quick-card-editor-buttons"); // new selector
+	}
+
     if($editControls.length > 0)
     {
         showPointPicker($editControls.get(0));
@@ -702,12 +706,12 @@ function showPointPicker(location) {
 	if($(location).find('.picker').length) return;
 	
 	// Try to allow this to work with old card style (with save button) or new style (where title is always a textarea).
-	var $elementToAddPickerTo = $('.card-detail-title .edit-controls');
+	var $elementToAddPickerTo = $('.quick-card-editor-buttons');
 	if($elementToAddPickerTo.length == 0){
 		$elementToAddPickerTo = $(".js-card-detail-title-input").closest('.window-header');
 	}
 
-	var $picker = $('<div/>', {class: "picker"}).appendTo($elementToAddPickerTo.get(0));
+	var $picker = $('<div/>', {class: "picker quick-card-editor-buttons-item"}).appendTo($elementToAddPickerTo.get(0));
 	$picker.append($('<span>', {class: "picker-title"}).text("Estimated Points"));
 	
 	var estimateSequence = (S4T_SETTINGS[SETTING_NAME_ESTIMATES].replace(/ /g, '')).split(',');
@@ -715,7 +719,7 @@ function showPointPicker(location) {
 		var value = $(this).text();
 		var $text = $('.card-detail-title .edit textarea'); // old text-areas
 		if($text.length == 0){
-			$text = $('textarea.js-card-detail-title-input'); // new text-area
+			$text = $('textarea.list-card-edit-title'); // new text-area
 		}
 		var text = $text.val();
 
@@ -723,22 +727,23 @@ function showPointPicker(location) {
 		$text[0].value=text.match(reg)?text.replace(reg, '('+value+') '):'('+value+') ' + text;
 
 		// in old-textarea method, click our button so it all gets saved away
-		$(".card-detail-title .edit .js-save-edit").click();
-		// in new-textarea method, have to do a few actions to get it to save after we click away from the card
-		$('textarea.js-card-detail-title-input').click();
-		$('textarea.js-card-detail-title-input').focus();
+		var $saveButton = $('input.js-save-edits');
+		$saveButton.click();
+		// // in new-textarea method, have to do a few actions to get it to save after we click away from the card
+		// $('textarea.js-card-detail-title-input').click();
+		// $('textarea.js-card-detail-title-input').focus();
 
 		return false;
 	}));
 	
 	if($(location).find('.picker-consumed').length) return;
-	var $pickerConsumed = $('<div/>', {class: "picker-consumed"}).appendTo($elementToAddPickerTo.get(0));
+	var $pickerConsumed = $('<div/>', {class: "picker-consumed quick-card-editor-buttons-item"}).appendTo($elementToAddPickerTo.get(0));
 	$pickerConsumed.append($('<span>', {class: "picker-title"}).text("Consumed Points"));
 
 	var consumedSequence = (S4T_SETTINGS[SETTING_NAME_ESTIMATES]).split(',');
 	for (var i in consumedSequence) $pickerConsumed.append($('<span>', {class: "point-value"}).text(consumedSequence[i]).click(function(){
 		var value = $(this).text();
-		var $text = $('.card-detail-title .edit textarea'); // old text-areas
+		var $text = $('textarea.list-card-edit-title'); // old text-areas
 		if($text.length == 0){
 			$text = $('textarea.js-card-detail-title-input'); // new text-area
 		}
@@ -747,11 +752,13 @@ function showPointPicker(location) {
 		// replace consumed value in card title
 		$text[0].value=text.match(regC)?text.replace(regC, ' ['+value+']'):text + ' ['+value+']';
 
-		// in old-textarea method, click our button so it all gets saved away
-		$(".card-detail-title .edit .js-save-edit").click();
-		// in new-textarea method, have to do a few actions to get it to save after we click away from the card
-		$('textarea.js-card-detail-title-input').click();
-		$('textarea.js-card-detail-title-input').focus();
+		var $saveButton = $('input.js-save-edits');
+		$saveButton.click();
+		// // in old-textarea method, click our button so it all gets saved away
+		// $(".card-detail-title .edit .js-save-edit").click();
+		// // in new-textarea method, have to do a few actions to get it to save after we click away from the card
+		// $('textarea.js-card-detail-title-input').click();
+		// $('textarea.js-card-detail-title-input').focus();
 
 		return false;
 	}));
