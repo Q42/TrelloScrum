@@ -127,7 +127,7 @@ $(function(){
 
 // Recalculates every card and its totals (used for significant DOM modifications).
 var recalcListAndTotal = debounce(function($el){
-    ($el||$('.list')).each(function(){
+    ($el||$("[data-testid='list']")).each(function(){
 		if(!this.list) new List(this);
 		else if(this.list.refreshList){
 			this.list.refreshList(); // make sure each card's points are still accurate (also calls list.calc()).
@@ -465,7 +465,7 @@ var lto;
 function calcListPoints(){
 	clearTimeout(lto);
 	lto = setTimeout(function(){
-		$('.list').each(function(){
+		$("[data-testid='list']").each(function(){
 			if(!this.list) new List(this);
 			else if(this.list.calc) this.list.calc();
 		});
@@ -485,7 +485,7 @@ function List(el){
 	function readCard($c){
 		if($c.target) {
 			if(!/list-card/.test($c.target.className)) return;
-			$c = $($c.target).filter('.list-card:not(.placeholder)');
+			$c = $($c.target).filter("[data-testid='list-card']:not(.placeholder)");
 		}
 		$c.each(function(){
 			if(!this.listCard) for (var i in _pointsAttr){
@@ -507,11 +507,11 @@ function List(el){
 		//if(e&&e.target&&!$(e.target).hasClass('list-card')) return; // TODO: REMOVE - What was this? We never pass a param into this function.
 		clearTimeout(to);
 		to = setTimeout(function(){
-			$total.empty().appendTo($list.find('.list-title,.list-header'));
+			$total.empty().appendTo($list.find("[data-testid='list-title'],[data-testid='list-header']"));
 			for (var i in _pointsAttr){
 				var score=0,
 					attr = _pointsAttr[i];
-				$list.find('.list-card:not(.placeholder)').each(function(){
+				$list.find("[data-testid='list-card']:not(.placeholder)").each(function(){
 					if(!this.listCard) return;
 					if(!isNaN(Number(this.listCard[attr].points))){
 						// Performance note: calling :visible in the selector above leads to noticible CPU usage.
@@ -529,7 +529,7 @@ function List(el){
 	};
     
     this.refreshList = debounce(function(){
-        readCard($list.find('.list-card:not(.placeholder)'));
+        readCard($list.find("[data-testid='list-card']:not(.placeholder)"));
         this.calc(); // readCard will call this.calc() if any of the cards get refreshed.
     }, 500, false);
 
@@ -552,7 +552,7 @@ function List(el){
 			{
 				var list;
 				// It appears this was an actual mutation and not a recursive notification.
-				$list = $target.closest(".list");
+				$list = $target.closest("[data-testid='list']");
 				if($list.length > 0){
 					list = $list.get(0).list;
 					if(!list){
@@ -569,7 +569,7 @@ function List(el){
     cardAddedRemovedObserver.observe($list.get(0), obsConfig);
 
 	setTimeout(function(){
-		readCard($list.find('.list-card'));
+		readCard($list.find("[data-testid='list-card']"));
 		setTimeout(el.list.calc);
 	});
 };
@@ -607,7 +607,7 @@ function ListCard(el, identifier){
 		clearTimeout(to);
 
 		to = setTimeout(function(){
-			var $title=$card.find('.list-card-title');
+			var $title=$card.find("[data-testid='card-name']");
 			if(!$title[0])return;
 			// This expression gets the right value whether Trello has the card-number span in the DOM or not (they recently removed it and added it back).
 			var titleTextContent = (($title[0].childNodes.length > 1) ? $title[0].childNodes[$title[0].childNodes.length-1].textContent : $title[0].textContent);
@@ -648,7 +648,7 @@ function ListCard(el, identifier){
 				} else {
 					$title[0].textContent = parsedTitle; // if they yank the card numbers out of the DOM again.
 				}
-				var list = $card.closest('.list');
+				var list = $card.closest("[data-testid='list']");
 				if(list[0]){
 					list[0].list.calc();
 				}
@@ -668,10 +668,10 @@ function ListCard(el, identifier){
 				$.each(mutation.addedNodes, function(index, node){
 					if($(node).hasClass('card-short-id')){
 						// Found a card-short-id added to the DOM. Need to refresh this card.
-						var listElement = $target.closest('.list').get(0);
+						var listElement = $target.closest("[data-testid='list']").get(0);
 						if(!listElement.list) new List(listElement); // makes sure the .list in the DOM has a List object
 
-						var $card = $target.closest('.list-card');
+						var $card = $target.closest("[data-testid='list-card']");
 						if($card.length > 0){
 							var listCardHash = $card.get(0).listCard;
 							if(listCardHash){
