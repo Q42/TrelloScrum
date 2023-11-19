@@ -634,7 +634,7 @@ function ListCard(el, identifier){
 					.text(that.points)
 					[(consumed?'add':'remove')+'Class']('consumed')
 					.attr({title: 'This card has '+that.points+ (consumed?' consumed':'')+' storypoint' + (that.points == 1 ? '.' : 's.')})
-					.prependTo($card.find('.badges'));
+					.prependTo($card.find("[data-testid='card-front-badges']"));
 
 				// Update the DOM element's textContent and data if there were changes.
 				if(titleTextContent != parsedTitle){
